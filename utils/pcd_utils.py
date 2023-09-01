@@ -37,12 +37,11 @@ def paired_association(pcd_dataset, target_cloud_index, src_cloud_index, pcd_com
     return pcd_combined
 
 
-# todo
 def hidden_removal(pcd):
     diameter = np.linalg.norm(
         np.asarray(pcd.get_max_bound()) - np.asarray(pcd.get_min_bound())
     )
-    camera = [0, 0, diameter]
+    camera = [0, 0, 0]
     radius = diameter * 100
     _, pt_map = pcd.hidden_point_removal(camera, radius)
 
