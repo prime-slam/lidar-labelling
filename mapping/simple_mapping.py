@@ -3,12 +3,12 @@ import cv2
 import numpy as np
 import open3d as o3d
 
-from abstract_mapping import AbstractMapping
+from mapping.abstract_mapping import AbstractMapping
 
-from image_utils import get_annotated_image
+from utils.image_utils import get_annotated_image
 
-# from pcd_utils import hidden_removal
-from pcd_utils import get_point_map
+# from utils.pcd_utils import hidden_removal
+from utils.pcd_utils import get_point_map
 
 from constants import VOXEL_SIZE
 

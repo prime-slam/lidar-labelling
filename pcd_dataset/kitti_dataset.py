@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import open3d as o3d
 
-from abstract_pcd_dataset import AbstractPointCloudDataset
+from pcd_dataset.abstract_pcd_dataset import AbstractPointCloudDataset
 
 from constants import VOXEL_SIZE
 
