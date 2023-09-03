@@ -7,10 +7,8 @@ from mapping.abstract_mapping import AbstractMapping
 
 from utils.image_utils import get_annotated_image
 
-from utils.pcd_utils import hidden_removal
+from utils.pcd_utils import remove_hidden_points
 from utils.pcd_utils import get_point_map
-
-from constants import VOXEL_SIZE
 
 
 class SimpleMapping(AbstractMapping):
@@ -44,8 +42,7 @@ class SimpleMapping(AbstractMapping):
         return points_ind_to_pixels, points_colors
 
     def get_combined_labeled_point_clouds(self, start_index, end_index):
-        map = get_point_map(self.pcd_dataset, start_index, end_index)
-        pcd_combined_down = map.voxel_down_sample(VOXEL_SIZE)
+        pcd_combined = get_point_map(self.pcd_dataset, start_index, end_index)
 
         labeled_pcds = []
         for current_image_index in range(start_index, end_index):
@@ -53,12 +50,12 @@ class SimpleMapping(AbstractMapping):
             annotated_image = get_annotated_image(image_from_dataset)
 
             pcds_prepared = self.pcd_dataset.prepare_points_before_mapping(
-                copy.deepcopy(pcd_combined_down),
+                copy.deepcopy(pcd_combined),
                 start_index,
                 current_image_index
             )
 
-            pcd_hidden_removal = hidden_removal(pcds_prepared)
+            pcd_hidden_removal = remove_hidden_points(pcds_prepared)
 
             cam_image = cv2.cvtColor(np.array(annotated_image), cv2.COLOR_RGB2BGR)
             img_shape = cam_image.shape[1], cam_image.shape[0]

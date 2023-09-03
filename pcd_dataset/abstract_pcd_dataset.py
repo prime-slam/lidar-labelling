@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class AbstractPointCloudDataset(ABC):
+class AbstractDataset(ABC):
 
     def __init__(self, dataset):
         self._dataset = dataset

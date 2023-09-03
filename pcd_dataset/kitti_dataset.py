@@ -3,12 +3,10 @@ import cv2
 import numpy as np
 import open3d as o3d
 
-from pcd_dataset.abstract_pcd_dataset import AbstractPointCloudDataset
-
-from constants import VOXEL_SIZE
+from pcd_dataset.abstract_pcd_dataset import AbstractDataset
 
 
-class KittiDataset(AbstractPointCloudDataset):
+class KittiDataset(AbstractDataset):
 
     def __init__(self, dataset_path, sequence):
         super().__init__(pykitti.odometry(dataset_path, sequence))
@@ -36,7 +34,7 @@ class KittiDataset(AbstractPointCloudDataset):
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
 
-        return pcd.voxel_down_sample(VOXEL_SIZE)
+        return pcd
 
     def get_image(self, index):
         image = self.dataset.get_cam2(index)
