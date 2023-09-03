@@ -10,21 +10,6 @@ class KittiDataset(AbstractDataset):
 
     def __init__(self, dataset_path, sequence):
         super().__init__(pykitti.odometry(dataset_path, sequence))
-        self._poses = self.dataset.poses
-        self._T_lidar2cam = self.dataset.calib.T_cam2_velo
-        self._cam_intrinsics = self.dataset.calib.K_cam2
-
-    @property
-    def poses(self):
-        return self._poses
-
-    @property
-    def T_lidar2cam(self):
-        return self._T_lidar2cam
-
-    @property
-    def cam_intrinsics(self):
-        return self._cam_intrinsics
 
     def get_point_cloud(self, index):
         points = self.dataset.get_velo(index)[:, :3]
@@ -33,31 +18,41 @@ class KittiDataset(AbstractDataset):
 
         return pcd
 
-    def get_image(self, index):
-        image = self.dataset.get_cam2(index)
-        return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    def get_camera_names(self):
+        return ["cam0", "cam1", "cam2", "cam3"]
 
-    def calculate_pcd_motion_matrix(self, src_index, target_index):
-        target_cloud_poses = self.poses[target_index]
-        src_cloud_poses = self.poses[src_index]
+    def get_camera_image(self, cam_name, index):
+        image, color = None, None
+        if cam_name == "cam0":
+            image, color = self.dataset.get_cam0(index), cv2.COLOR_GRAY2BGR
+        elif cam_name == "cam1":
+            image, color = self.dataset.get_cam1(index), cv2.COLOR_GRAY2BGR
+        elif cam_name == "cam2":
+            image, color = self.dataset.get_cam2(index), cv2.COLOR_RGB2BGR
+        elif cam_name == "cam3":
+            image, color = self.dataset.get_cam3(index), cv2.COLOR_RGB2BGR
+        return cv2.cvtColor(np.array(image), color)
 
-        src_cam_to_target_poses = np.linalg.inv(target_cloud_poses) @ src_cloud_poses
-        matrix_src_cloud_to_target = np.linalg.inv(self.T_lidar2cam) @ src_cam_to_target_poses @ self.T_lidar2cam
+    def get_camera_intrinsics(self, cam_name):
+        if cam_name == "cam0":
+            return self.dataset.calib.K_cam0
+        elif cam_name == "cam1":
+            return self.dataset.calib.K_cam1
+        elif cam_name == "cam2":
+            return self.dataset.calib.K_cam2
+        elif cam_name == "cam3":
+            return self.dataset.calib.K_cam3
+        else:
+            return None
 
-        return matrix_src_cloud_to_target
-
-    def transform_to_pcd0(self, pcd=None, start_pcd_index=0):
-        matrix = np.linalg.inv(self.T_lidar2cam) @ self.poses[start_pcd_index] @ self.T_lidar2cam
-
-        return pcd.transform(matrix)
-
-    def transform_pcd0_to_cami_coordinate_system(self, pcd=None, i=0):
-        matrix = np.linalg.inv(self.poses[i]) @ self.T_lidar2cam
-
-        return pcd.transform(matrix)
-
-    def prepare_points_before_mapping(self, pcd, start_pcd_index, image_index):
-        pcd_L0 = self.transform_to_pcd0(pcd=pcd, start_pcd_index=start_pcd_index)
-        pcd_Ki = self.transform_pcd0_to_cami_coordinate_system(pcd=pcd_L0, i=image_index)
-
-        return pcd_Ki
+    def get_camera_extrinsics(self, cam_name):
+        if cam_name == "cam0":
+            return self.dataset.calib.T_cam0_velo
+        elif cam_name == "cam1":
+            return self.dataset.calib.T_cam1_velo
+        elif cam_name == "cam2":
+            return self.dataset.calib.T_cam2_velo
+        elif cam_name == "cam3":
+            return self.dataset.calib.T_cam3_velo
+        else:
+            return None

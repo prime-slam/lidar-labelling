@@ -11,9 +11,9 @@ class AbstractMapping(ABC):
         return self._pcd_dataset
 
     @abstractmethod
-    def points_to_pixels(self, points, image):
+    def points_to_pixels(self, cam_name, points, image):
         pass
 
     @abstractmethod
-    def get_combined_labeled_point_clouds(self, start_index, end_index):
+    def get_combined_labeled_point_clouds(self, cam_name, start_index, end_index):
         pass
