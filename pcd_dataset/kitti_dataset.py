@@ -14,20 +14,17 @@ class KittiDataset(AbstractDataset):
         self._T_lidar2cam = self.dataset.calib.T_cam2_velo
         self._cam_intrinsics = self.dataset.calib.K_cam2
 
-    def get_poses(self):
+    @property
+    def poses(self):
         return self._poses
 
-    poses = property(get_poses)
-
-    def get_T_lidar2cam(self):
+    @property
+    def T_lidar2cam(self):
         return self._T_lidar2cam
 
-    T_lidar2cam = property(get_T_lidar2cam)
-
-    def get_cam_intrinsics(self):
+    @property
+    def cam_intrinsics(self):
         return self._cam_intrinsics
-
-    cam_intrinsics = property(get_cam_intrinsics)
 
     def get_point_cloud(self, index):
         points = self.dataset.get_velo(index)[:, :3]

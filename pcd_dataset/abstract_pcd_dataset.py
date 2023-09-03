@@ -7,10 +7,9 @@ class AbstractDataset(ABC):
         self._dataset = dataset
         super().__init__()
 
-    def get_dataset(self):
+    @property
+    def dataset(self):
         return self._dataset
-
-    dataset = property(get_dataset)
 
     @abstractmethod
     def get_point_cloud(self, index):

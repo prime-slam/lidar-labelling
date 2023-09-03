@@ -6,10 +6,9 @@ class AbstractMapping(ABC):
         self._pcd_dataset = pcd_dataset
         super().__init__()
 
-    def get_pcd_dataset(self):
+    @property
+    def pcd_dataset(self):
         return self._pcd_dataset
-
-    pcd_dataset = property(get_pcd_dataset)
 
     @abstractmethod
     def points_to_pixels(self, points, img_shape, image):
