@@ -1,5 +1,4 @@
 import copy
-import cv2
 import numpy as np
 import open3d as o3d
 
@@ -16,8 +15,8 @@ class SimpleMapping(AbstractMapping):
     def __init__(self, pcd_dataset):
         super().__init__(pcd_dataset)
 
-    def points_to_pixels(self, points, img_shape, image):
-        img_width, img_height = img_shape
+    def points_to_pixels(self, points, image):
+        img_width, img_height = image.size
 
         points_proj = self.pcd_dataset.cam_intrinsics @ points.T
         points_proj[:2, :] /= points_proj[2, :]
@@ -57,10 +56,7 @@ class SimpleMapping(AbstractMapping):
 
             pcd_hidden_removal = remove_hidden_points(pcds_prepared)
 
-            cam_image = cv2.cvtColor(np.array(annotated_image), cv2.COLOR_RGB2BGR)
-            img_shape = cam_image.shape[1], cam_image.shape[0]
-
-            p2pix, colors = self.points_to_pixels(np.asarray(pcd_hidden_removal.points), img_shape, annotated_image)
+            p2pix, colors = self.points_to_pixels(np.asarray(pcd_hidden_removal.points), annotated_image)
 
             pcd_cut = o3d.geometry.PointCloud()
             pcd_cut.points = o3d.utility.Vector3dVector(np.asarray(pcd_hidden_removal.points)[list(p2pix.keys())])

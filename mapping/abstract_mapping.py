@@ -11,7 +11,7 @@ class AbstractMapping(ABC):
         return self._pcd_dataset
 
     @abstractmethod
-    def points_to_pixels(self, points, img_shape, image):
+    def points_to_pixels(self, points, image):
         pass
 
     @abstractmethod
