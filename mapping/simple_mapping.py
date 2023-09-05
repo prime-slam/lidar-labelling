@@ -15,8 +15,13 @@
 import copy
 import numpy as np
 import open3d as o3d
+import logging
 
 from mapping.abstract_mapping import AbstractMapping
+
+from utils.image_utils import format_colors_to_255
+
+from logger_message import SUCCESSFUL_IMAGE_PROCESSING
 
 from utils.image_utils import get_annotated_image
 
@@ -28,6 +33,8 @@ class SimpleMapping(AbstractMapping):
 
     def __init__(self, pcd_dataset):
         super().__init__(pcd_dataset)
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger('simple_mapping.SimpleMapping')
 
     def points_to_pixels(self, cam_name, points, image):
         img_width, img_height = image.size
@@ -75,15 +82,10 @@ class SimpleMapping(AbstractMapping):
 
             pcd_cut = o3d.geometry.PointCloud()
             pcd_cut.points = o3d.utility.Vector3dVector(np.asarray(pcd_hidden_removal.points)[list(p2pix.keys())])
-            pcd_cut.colors = o3d.utility.Vector3dVector(np.array(list(colors.values())) / 255)
-
-            o3d.io.write_point_cloud(
-                f"annotated_pcds/new_clouds_{start_index}_{end_index}_im{current_image_index}.pcd",
-                pcd_cut
-            )
+            pcd_cut.colors = o3d.utility.Vector3dVector(format_colors_to_255(list(colors.values())))
 
             labeled_pcds.append(pcd_cut)
 
-            print(f"image {current_image_index} processed")
+            self.logger.info(SUCCESSFUL_IMAGE_PROCESSING.format(current_image_index))
 
         return labeled_pcds

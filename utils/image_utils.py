@@ -29,6 +29,10 @@ def visualize_image(image):
     plt.imshow(image)
 
 
+def format_colors_to_255(colors):
+    return np.array(colors) / 255
+
+
 def get_annotated_image(cam_image):
     sam_result = get_array_instances_by_image_sam(cam_image)
     mask_annotator = sv.MaskAnnotator()
