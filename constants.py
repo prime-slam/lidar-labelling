@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pathlib import Path
-
 import torch
+
+from pathlib import Path
 
 CHECKPOINT_PATH = Path.cwd().joinpath('weights', 'sam_vit_h_4b8939.pth')
 

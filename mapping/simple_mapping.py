@@ -13,24 +13,19 @@
 # limitations under the License.
 
 import copy
+import logging
 import numpy as np
 import open3d as o3d
-import logging
-
-from mapping.abstract_mapping import AbstractMapping
-
-from utils.image_utils import format_colors_to_255
 
 from logger_message import SUCCESSFUL_IMAGE_PROCESSING
-
+from mapping.abstract_mapping import AbstractMapping
+from utils.image_utils import format_colors_to_255
 from utils.image_utils import get_annotated_image
-
 from utils.pcd_utils import remove_hidden_points
 from utils.pcd_utils import get_point_map
 
 
 class SimpleMapping(AbstractMapping):
-
     def __init__(self, pcd_dataset):
         super().__init__(pcd_dataset)
         logging.basicConfig(level=logging.INFO)

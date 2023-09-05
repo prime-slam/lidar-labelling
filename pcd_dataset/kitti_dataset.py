@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pykitti
 import cv2
 import numpy as np
 import open3d as o3d
+import pykitti
 
 from pcd_dataset.abstract_pcd_dataset import AbstractDataset
 
 
 class KittiDataset(AbstractDataset):
-
     def __init__(self, dataset_path, sequence):
         super().__init__(pykitti.odometry(dataset_path, sequence))
 

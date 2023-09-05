@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
-
 import numpy as np
+
+from abc import ABC, abstractmethod
 
 
 class AbstractDataset(ABC):
-
     def __init__(self, dataset):
         self._dataset = dataset
         self._cam_poses = self.dataset.poses

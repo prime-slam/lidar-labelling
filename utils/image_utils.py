@@ -16,9 +16,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import supervision as sv
 
-from segment_anything import sam_model_registry, SamAutomaticMaskGenerator
-
 from PIL import Image as im
+from segment_anything import sam_model_registry, SamAutomaticMaskGenerator
 
 from constants import CHECKPOINT_PATH
 from constants import DEVICE
