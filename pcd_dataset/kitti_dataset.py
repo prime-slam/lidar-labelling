@@ -17,12 +17,15 @@ import numpy as np
 import open3d as o3d
 import pykitti
 
+from pathlib import Path
+
 from pcd_dataset.abstract_pcd_dataset import AbstractDataset
 
 
 class KittiDataset(AbstractDataset):
-    def __init__(self, dataset_path, sequence):
+    def __init__(self, dataset_path, sequence, image_instances_path):
         super().__init__(pykitti.odometry(dataset_path, sequence))
+        self.image_instances_path = image_instances_path
 
     def get_point_cloud(self, index):
         points = self.dataset.get_velo(index)[:, :3]
@@ -45,6 +48,10 @@ class KittiDataset(AbstractDataset):
         elif cam_name == "cam3":
             image, color = self.dataset.get_cam3(index), cv2.COLOR_RGB2BGR
         return cv2.cvtColor(np.array(image), color)
+
+    def get_image_instances(self, cam_name, index):
+        masks_path = Path.cwd().joinpath(self.image_instances_path, cam_name, '{}.npz'.format(str(index).zfill(6)))
+        return np.load(masks_path, allow_pickle=True)['masks']
 
     def get_camera_intrinsics(self, cam_name):
         if cam_name == "cam0":

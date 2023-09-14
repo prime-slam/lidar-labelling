@@ -44,6 +44,10 @@ class AbstractDataset(ABC):
         pass
 
     @abstractmethod
+    def get_image_instances(self, cam_name, index):
+        pass
+
+    @abstractmethod
     def get_camera_intrinsics(self, cam_name):
         pass
 
