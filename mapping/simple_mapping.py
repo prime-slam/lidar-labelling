@@ -15,9 +15,11 @@
 import copy
 import logging
 import numpy as np
+import open3d as o3d
 
 from logger_message import SUCCESSFUL_IMAGE_PROCESSING
 from mapping.abstract_mapping import AbstractMapping
+from utils.image_utils import generate_random_colors
 from utils.pcd_utils import remove_hidden_points
 from utils.pcd_utils import get_point_map
 
@@ -32,6 +34,7 @@ class SimpleMapping(AbstractMapping):
         pcd_combined = get_point_map(cam_name, self.dataset, start_index, end_index)
 
         labeled_pcds = []
+        labeled_colored_pcds = []
         for current_image_index in range(start_index, end_index):
             pcds_prepared = self.dataset.prepare_points_before_mapping(
                 cam_name,
@@ -46,9 +49,14 @@ class SimpleMapping(AbstractMapping):
                 self.segment_instances(pcd_hidden_removal, cam_name, current_image_index)
             )
 
+            current_labeled_pcd_index = len(labeled_pcds) - 1
+            labeled_colored_pcds.append(
+                self.color_points_by_labels(pcd_hidden_removal, labeled_pcds[current_labeled_pcd_index])
+            )
+
             self.logger.info(SUCCESSFUL_IMAGE_PROCESSING.format(current_image_index))
 
-        return labeled_pcds
+        return labeled_pcds, labeled_colored_pcds
 
     def segment_instances(self, pcd, cam_name, image_index):
         masks = self.dataset.get_image_instances(cam_name, image_index)
@@ -90,3 +98,14 @@ class SimpleMapping(AbstractMapping):
             points_ind_to_pixels[ind] = points_coord[ind][:2].astype(int)
 
         return points_ind_to_pixels
+
+    def color_points_by_labels(self, pcd, labels):
+        random_colors = generate_random_colors(500)
+
+        colors = []
+        for i in range(labels.shape[0]):
+            colors.append(random_colors[int(labels[i]) + 1])
+
+        pcd.colors = o3d.utility.Vector3dVector(np.vstack(colors) / 255)
+
+        return pcd

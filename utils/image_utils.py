@@ -14,6 +14,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 import supervision as sv
 
 from PIL import Image as im
@@ -30,6 +31,14 @@ def visualize_image(image):
 
 def format_colors_to_255(colors):
     return np.array(colors) / 255
+
+
+def generate_random_colors(N):
+    colors = []
+    for _ in range(N):
+        colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
+
+    return colors
 
 
 def get_annotated_image(cam_image):
