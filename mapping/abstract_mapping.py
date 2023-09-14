@@ -25,7 +25,7 @@ class AbstractMapping(ABC):
         return self._dataset
 
     @abstractmethod
-    def points_to_pixels(self, cam_name, points, image):
+    def points_to_pixels(self, cam_name, points, img_shape):
         pass
 
     @abstractmethod
