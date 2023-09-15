@@ -16,16 +16,16 @@ from abc import ABC, abstractmethod
 
 
 class AbstractMapping(ABC):
-    def __init__(self, pcd_dataset):
-        self._pcd_dataset = pcd_dataset
+    def __init__(self, dataset):
+        self._dataset = dataset
         super().__init__()
 
     @property
-    def pcd_dataset(self):
-        return self._pcd_dataset
+    def dataset(self):
+        return self._dataset
 
     @abstractmethod
-    def points_to_pixels(self, cam_name, points, image):
+    def points_to_pixels(self, cam_name, points, img_shape):
         pass
 
     @abstractmethod

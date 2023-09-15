@@ -19,52 +19,24 @@ import open3d as o3d
 
 from logger_message import SUCCESSFUL_IMAGE_PROCESSING
 from mapping.abstract_mapping import AbstractMapping
-from utils.image_utils import format_colors_to_255
-from utils.image_utils import get_annotated_image
+from utils.image_utils import generate_random_colors
 from utils.pcd_utils import remove_hidden_points
 from utils.pcd_utils import get_point_map
 
 
 class SimpleMapping(AbstractMapping):
-    def __init__(self, pcd_dataset):
-        super().__init__(pcd_dataset)
+    def __init__(self, dataset):
+        super().__init__(dataset)
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger('simple_mapping.SimpleMapping')
 
-    def points_to_pixels(self, cam_name, points, image):
-        img_width, img_height = image.size
-
-        points_proj = self.pcd_dataset.get_camera_intrinsics(cam_name) @ points.T
-        points_proj[:2, :] /= points_proj[2, :]
-        points_coord = points_proj.T
-
-        pixels = image.load()
-
-        inds = np.where(
-            (points_coord[:, 0] < img_width) & (points_coord[:, 0] >= 0) &
-            (points_coord[:, 1] < img_height) & (points_coord[:, 1] >= 0) &
-            (points_coord[:, 2] > 0)
-        )[0]
-
-        points_ind_to_pixels = {}
-        points_colors = {}
-        for ind in inds:
-            points_ind_to_pixels[ind] = points_coord[ind][:2].astype(int)
-            x = points_ind_to_pixels[ind][0]
-            y = points_ind_to_pixels[ind][1]
-            points_colors[ind] = pixels[x, y]
-
-        return points_ind_to_pixels, points_colors
-
     def get_combined_labeled_point_clouds(self, cam_name, start_index, end_index):
-        pcd_combined = get_point_map(cam_name, self.pcd_dataset, start_index, end_index)
+        pcd_combined = get_point_map(cam_name, self.dataset, start_index, end_index)
 
         labeled_pcds = []
+        labeled_colored_pcds = []
         for current_image_index in range(start_index, end_index):
-            image_from_dataset = self.pcd_dataset.get_camera_image(cam_name, current_image_index)
-            annotated_image = get_annotated_image(image_from_dataset)
-
-            pcds_prepared = self.pcd_dataset.prepare_points_before_mapping(
+            pcds_prepared = self.dataset.prepare_points_before_mapping(
                 cam_name,
                 copy.deepcopy(pcd_combined),
                 start_index,
@@ -73,14 +45,67 @@ class SimpleMapping(AbstractMapping):
 
             pcd_hidden_removal = remove_hidden_points(pcds_prepared)
 
-            p2pix, colors = self.points_to_pixels(cam_name, np.asarray(pcd_hidden_removal.points), annotated_image)
+            labeled_pcds.append(
+                self.segment_instances(pcd_hidden_removal, cam_name, current_image_index)
+            )
 
-            pcd_cut = o3d.geometry.PointCloud()
-            pcd_cut.points = o3d.utility.Vector3dVector(np.asarray(pcd_hidden_removal.points)[list(p2pix.keys())])
-            pcd_cut.colors = o3d.utility.Vector3dVector(format_colors_to_255(list(colors.values())))
-
-            labeled_pcds.append(pcd_cut)
+            current_labeled_pcd_index = len(labeled_pcds) - 1
+            labeled_colored_pcds.append(
+                self.color_points_by_labels(pcd_hidden_removal, labeled_pcds[current_labeled_pcd_index])
+            )
 
             self.logger.info(SUCCESSFUL_IMAGE_PROCESSING.format(current_image_index))
 
-        return labeled_pcds
+        return labeled_pcds, labeled_colored_pcds
+
+    def segment_instances(self, pcd, cam_name, image_index):
+        masks = self.dataset.get_image_instances(cam_name, image_index)
+        image_labels = self.masks_to_image(masks)
+
+        p2pix = self.points_to_pixels(
+            cam_name,
+            np.asarray(pcd.points),
+            (image_labels.shape[1], image_labels.shape[0])
+        )
+
+        labels = np.zeros(np.asarray(pcd.points).shape[0])
+        for ind, value in p2pix.items():
+            labels[ind] = image_labels[value[1], value[0]]
+
+        return labels
+
+    def masks_to_image(self, masks):
+        image_labels = np.zeros(masks[0]['segmentation'].shape)
+        for i, mask in enumerate(masks):
+            image_labels[mask['segmentation']] = i + 1
+        return image_labels
+
+    def points_to_pixels(self, cam_name, points, img_shape):
+        img_width, img_height = img_shape
+
+        points_proj = self.dataset.get_camera_intrinsics(cam_name) @ points.T
+        points_proj[:2, :] /= points_proj[2, :]
+        points_coord = points_proj.T
+
+        inds = np.where(
+            (points_coord[:, 0] < img_width) & (points_coord[:, 0] >= 0) &
+            (points_coord[:, 1] < img_height) & (points_coord[:, 1] >= 0) &
+            (points_coord[:, 2] > 0)
+        )[0]
+
+        points_ind_to_pixels = {}
+        for ind in inds:
+            points_ind_to_pixels[ind] = points_coord[ind][:2].astype(int)
+
+        return points_ind_to_pixels
+
+    def color_points_by_labels(self, pcd, labels):
+        random_colors = generate_random_colors(500)
+
+        colors = []
+        for i in range(labels.shape[0]):
+            colors.append(random_colors[int(labels[i]) + 1])
+
+        pcd.colors = o3d.utility.Vector3dVector(np.vstack(colors) / 255)
+
+        return pcd

@@ -44,6 +44,10 @@ class AbstractDataset(ABC):
         pass
 
     @abstractmethod
+    def get_image_instances(self, cam_name, index):
+        pass
+
+    @abstractmethod
     def get_camera_intrinsics(self, cam_name):
         pass
 
@@ -64,7 +68,7 @@ class AbstractDataset(ABC):
 
         return pcd_Ki
 
-    def transform_to_pcd0(self, pcd=None, cam_name="cam0", start_pcd_index=0):
+    def transform_to_pcd0(self, pcd=None, cam_name='cam2', start_pcd_index=0):
         matrix = (
                 np.linalg.inv(self.get_camera_extrinsics(cam_name))
                 @ self.cam_poses[start_pcd_index]
@@ -73,7 +77,7 @@ class AbstractDataset(ABC):
 
         return pcd.transform(matrix)
 
-    def transform_pcd0_to_cami_coordinate_system(self, pcd=None, cam_name="cam0", i=0):
+    def transform_pcd0_to_cami_coordinate_system(self, pcd=None, cam_name='cam2', i=0):
         matrix = np.linalg.inv(self.cam_poses[i]) @ self.get_camera_extrinsics(cam_name)
 
         return pcd.transform(matrix)
