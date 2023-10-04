@@ -19,7 +19,7 @@ import open3d as o3d
 
 from logger_message import SUCCESSFUL_IMAGE_PROCESSING
 from mapping.abstract_mapping import AbstractMapping
-from mapping.label import Label
+from mapping.sparse_matrix_utils import construct_coo_matrix_for_one_view
 from utils.image_utils import generate_random_colors
 from utils.pcd_utils import remove_hidden_points
 from utils.pcd_utils import get_point_map
@@ -37,6 +37,7 @@ class SimpleMapping(AbstractMapping):
         labeled_pcds = []
         labeled_colored_pcds = []
         point_labels_dict = {}
+        coo_matrix_list = []
         for current_image_index in range(start_index, end_index):
             pcds_prepared = self.dataset.prepare_points_before_mapping(
                 cam_name,
@@ -47,18 +48,19 @@ class SimpleMapping(AbstractMapping):
 
             pcd_hidden_removal = remove_hidden_points(pcds_prepared)
 
-            masks_count, labeled_pcd = self.segment_instances(pcd_hidden_removal, cam_name, current_image_index)
+            masks_count, labeled_pcd, data = self.segment_instances(pcd_hidden_removal, cam_name, current_image_index)
+            coo_matrix_list.append(construct_coo_matrix_for_one_view(data, current_image_index))
 
             labeled_pcds.append(labeled_pcd)
 
             current_labeled_pcd_index = len(labeled_pcds) - 1
 
-            self.fill_point_labels_dict(
-                point_labels_dict,
-                current_image_index,
-                labeled_pcds[current_labeled_pcd_index],
-                masks_count
-            )
+            # self.fill_point_labels_dict(
+            #     point_labels_dict,
+            #     current_image_index,
+            #     labeled_pcds[current_labeled_pcd_index],
+            #     masks_count
+            # )
 
             labeled_colored_pcds.append(
                 self.color_points_by_labels(pcd_hidden_removal, labeled_pcds[current_labeled_pcd_index])
@@ -66,22 +68,21 @@ class SimpleMapping(AbstractMapping):
 
             self.logger.info(SUCCESSFUL_IMAGE_PROCESSING.format(current_image_index))
 
-        return labeled_pcds, labeled_colored_pcds, point_labels_dict
+        return labeled_pcds, labeled_colored_pcds, point_labels_dict, coo_matrix_list
 
-    def fill_point_labels_dict(self, point_labels_dict, image_index, labeled_pcd, masks_count):
-        for i in range(labeled_pcd.shape[0]):
-            image_labels = np.zeros(masks_count + 1)
-            mask_num = int(labeled_pcd[i])
-            if mask_num != 0:
-                image_labels[mask_num] = 1
-
-            if i in point_labels_dict:
-                point_labels_dict[i].append(Label(image_index, image_labels))
-            else:
-                point_labels_dict[i] = [Label(image_index, image_labels)]
-
-        return point_labels_dict
-
+    # def fill_point_labels_dict(self, point_labels_dict, image_index, labeled_pcd, masks_count):
+    #     for i in range(labeled_pcd.shape[0]):
+    #         image_labels = np.zeros(masks_count + 1)
+    #         mask_num = int(labeled_pcd[i])
+    #         if mask_num != 0:
+    #             image_labels[mask_num] = 1
+    #
+    #         if i in point_labels_dict:
+    #             point_labels_dict[i].append(Label(image_index, image_labels))
+    #         else:
+    #             point_labels_dict[i] = [Label(image_index, image_labels)]
+    #
+    #     return point_labels_dict
 
     def segment_instances(self, pcd, cam_name, image_index):
         masks = self.dataset.get_image_instances(cam_name, image_index)
@@ -93,11 +94,14 @@ class SimpleMapping(AbstractMapping):
             (image_labels.shape[1], image_labels.shape[0])
         )
 
+        data = np.zeros(np.asarray(pcd.points).shape[0])
         labels = np.zeros(np.asarray(pcd.points).shape[0])
+
         for ind, value in p2pix.items():
             labels[ind] = image_labels[value[1], value[0]]
+            data[ind] = labels[ind]
 
-        return len(masks), labels
+        return len(masks), labels, data
 
     def masks_to_image(self, masks):
         image_labels = np.zeros(masks[0]['segmentation'].shape)
