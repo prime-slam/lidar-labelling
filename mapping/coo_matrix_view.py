@@ -12,20 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class CooMatrixView():
-    def __init__(self, row, col, data, image_index):
-        self._row = row
-        self._col = col
+class CooMatrixView:
+    def __init__(self, data, image_index):
         self._data = data
         self._image_index = image_index
-
-    @property
-    def row(self):
-        return self._row
-
-    @property
-    def col(self):
-        return self._col
 
     @property
     def data(self):

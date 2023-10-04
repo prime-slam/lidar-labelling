@@ -16,14 +16,12 @@ import numpy as np
 
 from scipy.sparse import coo_array
 
-from mapping.coo_matrix_view import CooMatrixView
-
 
 def construct_coo_matrix_for_multiple_views(coo_matrix_view_list, start_index):
     views_count = len(coo_matrix_view_list)
 
     row = calculate_row(coo_matrix_view_list, start_index)
-    col = np.concatenate([view.col for view in coo_matrix_view_list])
+    col = calculate_col(coo_matrix_view_list)
     data = np.concatenate([view.data for view in coo_matrix_view_list])
 
     return coo_array((data, (row, col)), shape=(views_count, len(data)))
@@ -46,10 +44,9 @@ def calculate_row(coo_matrix_view_list, start_index):
     return np.concatenate([row for row in row_list])
 
 
-def construct_coo_matrix_for_one_view(data, image_index):
-    points_count = len(data)
+def calculate_col(coo_matrix_view_list):
+    col_list = []
+    for view in coo_matrix_view_list:
+        col_list.append(np.array([i for i in range(len(view.data))], dtype=int))
 
-    row = np.zeros((points_count,), dtype=int)
-    col = np.array([i for i in range(points_count)], dtype=int)
-
-    return CooMatrixView(row, col, data, image_index)
+    return np.concatenate([col for col in col_list])

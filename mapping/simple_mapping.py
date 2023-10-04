@@ -19,7 +19,7 @@ import open3d as o3d
 
 from logger_message import SUCCESSFUL_IMAGE_PROCESSING
 from mapping.abstract_mapping import AbstractMapping
-from mapping.sparse_matrix_utils import construct_coo_matrix_for_one_view
+from mapping.coo_matrix_view import CooMatrixView
 from utils.image_utils import generate_random_colors
 from utils.pcd_utils import remove_hidden_points
 from utils.pcd_utils import get_point_map
@@ -49,8 +49,8 @@ class SimpleMapping(AbstractMapping):
 
             labeled_pcd, data = self.segment_instances(pcd_hidden_removal, cam_name, current_image_index)
 
-            coo_matrix_list.append(construct_coo_matrix_for_one_view(data, current_image_index))
             labeled_pcds.append(labeled_pcd)
+            coo_matrix_list.append(CooMatrixView(data, current_image_index))
 
             current_labeled_pcd_index = len(labeled_pcds) - 1
             labeled_colored_pcds.append(
