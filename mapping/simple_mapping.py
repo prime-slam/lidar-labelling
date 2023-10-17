@@ -15,12 +15,10 @@
 import copy
 import logging
 import numpy as np
-import open3d as o3d
 
 from logger_message import SUCCESSFUL_IMAGE_PROCESSING
 from mapping.abstract_mapping import AbstractMapping
 from mapping.coo_matrix_view import CooMatrixView
-from utils.image_utils import generate_random_colors
 from utils.pcd_utils import remove_hidden_points
 from utils.pcd_utils import get_point_map
 
@@ -34,32 +32,31 @@ class SimpleMapping(AbstractMapping):
     def get_combined_labeled_point_clouds(self, cam_name, start_index, end_index):
         pcd_combined = get_point_map(cam_name, self.dataset, start_index, end_index)
 
-        labeled_pcds = []
-        labeled_colored_pcds = []
+        pcds = []
         coo_matrix_list = []
         for current_image_index in range(start_index, end_index):
-            pcds_prepared = self.dataset.prepare_points_before_mapping(
-                cam_name,
-                copy.deepcopy(pcd_combined),
-                start_index,
-                current_image_index
-            )
+            pcd_prepared = self.prepare_pcd_before_mapping(cam_name, pcd_combined, start_index, current_image_index)
 
-            pcd_hidden_removal = remove_hidden_points(pcds_prepared)
+            labels_data = self.segment_instances(pcd_prepared, cam_name, current_image_index)
 
-            labeled_pcd, data = self.segment_instances(pcd_hidden_removal, cam_name, current_image_index)
-
-            labeled_pcds.append(labeled_pcd)
-            coo_matrix_list.append(CooMatrixView(data, current_image_index, pcd_hidden_removal))
-
-            current_labeled_pcd_index = len(labeled_pcds) - 1
-            labeled_colored_pcds.append(
-                self.color_points_by_labels(pcd_hidden_removal, labeled_pcds[current_labeled_pcd_index])
+            pcds.append(pcd_prepared)
+            coo_matrix_list.append(
+                CooMatrixView(labels_data, current_image_index, pcd_prepared)
             )
 
             self.logger.info(SUCCESSFUL_IMAGE_PROCESSING.format(current_image_index))
 
-        return labeled_pcds, labeled_colored_pcds, coo_matrix_list
+        return coo_matrix_list, pcds
+
+    def prepare_pcd_before_mapping(self, cam_name, pcd, start_index, current_image_index):
+        pcds_prepared = self.dataset.prepare_points_before_mapping(
+            cam_name,
+            copy.deepcopy(pcd),
+            start_index,
+            current_image_index
+        )
+
+        return remove_hidden_points(pcds_prepared)
 
     def segment_instances(self, pcd, cam_name, image_index):
         masks = self.dataset.get_image_instances(cam_name, image_index)
@@ -71,14 +68,12 @@ class SimpleMapping(AbstractMapping):
             (image_labels.shape[1], image_labels.shape[0])
         )
 
-        labels = np.zeros(np.asarray(pcd.points).shape[0])
-        data = np.zeros(len(labels))
+        labels_data = np.zeros(np.asarray(pcd.points).shape[0])
 
         for ind, value in p2pix.items():
-            labels[ind] = image_labels[value[1], value[0]]
-            data[ind] = labels[ind]
+            labels_data[ind] = image_labels[value[1], value[0]]
 
-        return labels, data
+        return labels_data
 
     def masks_to_image(self, masks):
         image_labels = np.zeros(masks[0]['segmentation'].shape)
@@ -104,14 +99,3 @@ class SimpleMapping(AbstractMapping):
             points_ind_to_pixels[ind] = points_coord[ind][:2].astype(int)
 
         return points_ind_to_pixels
-
-    def color_points_by_labels(self, pcd, labels):
-        random_colors = generate_random_colors(500)
-
-        colors = []
-        for i in range(labels.shape[0]):
-            colors.append(random_colors[int(labels[i]) + 1])
-
-        pcd.colors = o3d.utility.Vector3dVector(np.vstack(colors) / 255)
-
-        return pcd
