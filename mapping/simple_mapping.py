@@ -50,7 +50,7 @@ class SimpleMapping(AbstractMapping):
             labeled_pcd, data = self.segment_instances(pcd_hidden_removal, cam_name, current_image_index)
 
             labeled_pcds.append(labeled_pcd)
-            coo_matrix_list.append(CooMatrixView(data, current_image_index))
+            coo_matrix_list.append(CooMatrixView(data, current_image_index, pcd_hidden_removal))
 
             current_labeled_pcd_index = len(labeled_pcds) - 1
             labeled_colored_pcds.append(

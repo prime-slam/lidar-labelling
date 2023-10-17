@@ -13,9 +13,10 @@
 # limitations under the License.
 
 class CooMatrixView:
-    def __init__(self, data, image_index):
+    def __init__(self, data, image_index, pcd):
         self._data = data
         self._image_index = image_index
+        self._pcd = pcd
 
     @property
     def data(self):
@@ -24,3 +25,7 @@ class CooMatrixView:
     @property
     def image_index(self):
         return self._image_index
+
+    @property
+    def pcd(self):
+        return self._pcd

@@ -34,7 +34,7 @@ def format_colors_to_255(colors):
 
 
 def generate_random_colors(N):
-    colors = []
+    colors = [[0, 0, 0]]
     for _ in range(N):
         colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
 
