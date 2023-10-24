@@ -15,6 +15,8 @@
 import numpy as np
 import open3d as o3d
 
+from utils.image_utils import generate_random_colors
+
 
 def visualize_pcd(pcd):
     o3d.visualization.draw_geometries([pcd])
@@ -61,3 +63,25 @@ def remove_hidden_points(pcd):
     _, pt_map = pcd.hidden_point_removal(camera, radius)
 
     return pcd.select_by_index(pt_map)
+
+
+def visualize_from_one_hot_encoding(encoding_matrix, enc, pcds, start_index, view_index):
+    instances = enc.inverse_transform(encoding_matrix)
+    print(instances[40])
+    print(instances[40][view_index - start_index])
+    print(len(instances))
+    print(pcds[view_index - start_index])
+
+    pcd = pcds[view_index - start_index]
+
+    random_colors = generate_random_colors(500)
+
+    colors = []
+
+    for i in range(len(np.asarray(pcd.points))):
+        colors.append(random_colors[int(instances[i][view_index - start_index])])
+
+    print(len(colors))
+    pcd.colors = o3d.utility.Vector3dVector(np.vstack(colors) / 255)
+
+    return pcd
