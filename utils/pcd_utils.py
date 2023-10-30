@@ -65,6 +65,59 @@ def remove_hidden_points(pcd):
     return pcd.select_by_index(pt_map)
 
 
+def visualize_by_clusters(clusters, pcd):
+    random_colors = generate_random_colors(len(clusters) + 1)
+
+    colors = []
+    for i in range(len(np.asarray(pcd.points))):
+        index = find_point_in_clusters(clusters, pcd.points[i])
+        colors.append(random_colors[index + 1 if index != 1000 else 0])
+
+    pcd.colors = o3d.utility.Vector3dVector(np.vstack(colors) / 255)
+    return pcd
+
+
+def find_point_in_clusters(clusters, point):
+    for itr in range(len(clusters)):
+        cluster = clusters[itr]
+        for itr2 in range(len(cluster)):
+            if (cluster[itr2] == point).all():
+                return itr
+    return 1000
+
+
+def find_points_in_sphere(src_points, R, enc_coo_non_zero_instances):
+    x0, y0, z0 = find_center_of_sphere(src_points)
+
+    points_in_sphere = []
+    enc_coo_non_zero_instances_points_in_sphere = []
+    for itr in range(len(src_points)):
+        point = src_points[itr]
+        dx = (point[0] - x0) ** 2
+        dy = (point[1] - y0) ** 2
+        dz = (point[2] - z0) ** 2
+
+        if dx + dy + dz <= R ** 2:
+            points_in_sphere.append(point)
+            enc_coo_non_zero_instances_points_in_sphere.append(enc_coo_non_zero_instances[itr])
+
+    return points_in_sphere, enc_coo_non_zero_instances_points_in_sphere
+
+
+def find_center_of_sphere(points):
+    x, y, z = 0, 0, 0
+    for point in range(len(points)):
+        x += points[point][0]
+        y += points[point][1]
+        z += points[point][2]
+
+    x0 = x / len(points)
+    y0 = y / len(points)
+    z0 = z / len(points)
+    print("central point = ({}, {}, {})".format(x0, y0, z0))
+    return x0, y0, z0
+
+
 def visualize_from_one_hot_encoding(encoding_matrix, enc, pcds, start_index, view_index):
     instances = enc.inverse_transform(encoding_matrix)
     print(instances[40])
