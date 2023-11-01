@@ -104,6 +104,25 @@ def find_points_in_sphere(src_points, R, enc_coo_non_zero_instances):
     return points_in_sphere, enc_coo_non_zero_instances_points_in_sphere
 
 
+def find_points_in_sphere2(src_points, R, arr):
+    x0, y0, z0 = find_center_of_sphere(src_points)
+
+    q = np.vstack(arr)
+    points_in_sphere = []
+    coo_non_zero_instances_points_in_sphere = []
+    for itr in range(len(src_points)):
+        point = src_points[itr]
+        dx = (point[0] - x0) ** 2
+        dy = (point[1] - y0) ** 2
+        dz = (point[2] - z0) ** 2
+
+        if dx + dy + dz <= R ** 2:
+            points_in_sphere.append(point)
+            coo_non_zero_instances_points_in_sphere.append(q[itr])
+
+    return np.vstack(points_in_sphere), np.vstack(coo_non_zero_instances_points_in_sphere)
+
+
 def find_center_of_sphere(points):
     x, y, z = 0, 0, 0
     for point in range(len(points)):

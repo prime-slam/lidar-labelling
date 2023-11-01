@@ -39,13 +39,15 @@ def calculate_distances(inverse_enc_coo_non_zero_instances):
 
             # check the values of point instances in each view
             score = 0
+            count_non_zero = 0
             for view in range(len(instances_second)):
                 instance_first = int(instances_first[view])
                 instance_second = int(instances_second[view])
-                if (instance_first != 0) & (instance_second != 0) & (instance_first == instance_second):
-                    # +1 for each non-zero match
-                    score += 1
-            distances_from_first_to[second] = 2 if score == 0 else 1 - (score / len(instances_second))
+                if (instance_first != 0) & (instance_second != 0):
+                    count_non_zero += 1
+                    if instance_first == instance_second:
+                        score += 1
+            distances_from_first_to[second] = 0 if score == 0 else (score / count_non_zero)
 
         # fill in the whole distance row for point first
         distances[first] = distances_from_first_to
@@ -56,6 +58,34 @@ def calculate_distances(inverse_enc_coo_non_zero_instances):
             distances[i, j] = distances[j, i]
 
     return distances
+
+
+def _sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta):
+    mask = np.where(spatial_distance <= proximity_threshold)
+
+    # Initialize the distance matrix with zeros
+    num_points, num_views = sam_features.shape
+    distance_matrix = np.zeros((num_points, num_points))
+
+    # Iterate over rows (points)
+    for (point1, point2) in (zip(*mask)):
+        view_counter = 0
+        for view in range(num_views):
+            instance_id1 = sam_features[point1, view]
+            instance_id2 = sam_features[point2, view]
+
+            if instance_id1 != 0 and instance_id2 != 0:
+                view_counter += 1
+                if instance_id1 != instance_id2:
+                    distance_matrix[point1, point2] += 1
+        if view_counter:
+            distance_matrix[point1, point2] /= view_counter
+            distance_matrix[point2, point1] = distance_matrix[point1, point2]
+
+    mask = np.where(spatial_distance <= proximity_threshold, 1, 0)
+    label_distance = mask * np.exp(-beta * distance_matrix)
+
+    return label_distance, mask
 
 
 def print_pairwise_distances(distances, start, end):

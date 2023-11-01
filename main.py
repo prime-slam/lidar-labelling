@@ -17,13 +17,15 @@ import open3d as o3d
 
 from pathlib import Path
 from sklearn.preprocessing import OneHotEncoder
+from scipy.spatial.distance import cdist
 
 from awesome_normalized_cut import normalized_cut
 from mapping.simple_mapping import SimpleMapping
 from mapping.sparse_matrix_utils import construct_coo_matrix_for_multiple_views
 from pcd_dataset.kitti_dataset import KittiDataset
-from utils.pcd_utils import visualize_by_clusters, find_points_in_sphere
-from utils.distances_utils import calculate_distances, print_pairwise_distances
+from utils.pcd_utils import visualize_by_clusters, find_points_in_sphere, find_points_in_sphere2
+from utils.distances_utils import calculate_distances, print_pairwise_distances, _sam_label_distance
+from utils.image_utils import generate_random_colors
 
 
 def main():
@@ -37,33 +39,54 @@ def main():
 
     # whole map
     coo_result = construct_coo_matrix_for_multiple_views(coo_matrix, 20)
+    print("88")
 
     # enc whole map
     enc = OneHotEncoder(handle_unknown='ignore', sparse_output=True)
     enc.fit(coo_result.T.toarray())
     enc_coo_result = enc.transform(coo_result.T.toarray()).toarray()
     inverse_enc_coo_result = enc.inverse_transform(enc_coo_result)
+    print("889")
 
     # delete points that are unlabeled on all the views
-    points, map_old_new_point_ind, enc_coo_non_zero_instances = get_non_zero_instances_points(
-        pcds, enc_coo_result, inverse_enc_coo_result
+    points, map_old_new_point_ind, coo_non_zero_instances = get_non_zero_instances_points(
+        pcds, coo_result, inverse_enc_coo_result
     )
+    print("8810")
 
     # selection of points that are inside the sphere
-    points_in_sphere, enc_coo_non_zero_instances_points_in_sphere = find_points_in_sphere(points, 4, enc_coo_non_zero_instances)
+    print("points = {}".format(len(points)))
+    print("coo_non_zero_instances = {}".format(len(coo_non_zero_instances)))
+    points_in_sphere, coo_non_zero_instances_points_in_sphere = find_points_in_sphere2(points, 4, coo_non_zero_instances)
+    print("points_in_sphere = {}".format(len(points_in_sphere)))
+    print("coo_non_zero_instances_points_in_sphere = {}".format(len(coo_non_zero_instances_points_in_sphere)))
+
+    # M = coo_non_zero_instances_points_in_sphere.astype(int)
+    # instances = M[:, 2]
+    # colors = generate_random_colors(100)
+    # pcd_baby1 = o3d.geometry.PointCloud()
+    # pcd_baby1.points = o3d.utility.Vector3dVector(points_in_sphere)
+    # pcd_baby1.colors = o3d.utility.Vector3dVector(np.zeros(points_in_sphere.shape))
+    # for i in range(instances.shape[0]):
+    #     pcd_baby1.colors[i] = np.array(colors[instances[i]]) / 255
+    # o3d.visualization.draw_geometries([pcd_baby1])
+
+    spatial_distance = cdist(points_in_sphere, points_in_sphere)
+    dist, masks = _sam_label_distance(coo_non_zero_instances_points_in_sphere[:, :1], spatial_distance, 2, 10)
+
     pcd_baby = o3d.geometry.PointCloud()
     pcd_baby.points = o3d.utility.Vector3dVector(points_in_sphere)
 
-    distances_points_in_sphere = calculate_distances(enc.inverse_transform(enc_coo_non_zero_instances_points_in_sphere))
+    # distances_points_in_sphere = calculate_distances(enc.inverse_transform(enc_coo_non_zero_instances_points_in_sphere))
 
-    clusters = normalized_cut(distances_points_in_sphere, np.asarray(points_in_sphere), 1.0001)
+    clusters = normalized_cut(dist, np.asarray(points_in_sphere), 0.3)
 
     print("number of clusters = {}".format(len(clusters)))
     print("number of points = {}".format(len(pcd_baby.points)))
 
-    # pcd_baby_color = visualize_by_clusters(clusters, pcd_baby)
-    # o3d.io.write_point_cloud('cloud_20_23_4m_T1-00018.pcd', pcd_baby_color)
-    # o3d.visualization.draw_geometries([pcd_baby_color])
+    pcd_baby_color = visualize_by_clusters(clusters, pcd_baby)
+    o3d.io.write_point_cloud('cloud_20_23_4m_T1-0001-new.pcd', pcd_baby_color)
+    o3d.visualization.draw_geometries([pcd_baby_color])
 
     # inverse_in_sphere = enc.inverse_transform(enc_coo_non_zero_instances_points_in_sphere)
     # for itr in range(len(clusters)):
@@ -98,22 +121,23 @@ def main1():
     # clusters = normalized_cut(distances_downpcd, np.asarray(downpcd_trace[0].points), 1.0038)
 
 
-def get_non_zero_instances_points(pcds, enc_coo_result, inverse_enc_coo_result):
+def get_non_zero_instances_points(pcds, coo_result, inverse_enc_coo_result):
     summary_pcd_points = []
     for itr in range(len(pcds)):
         summary_pcd_points += pcds[itr].points
 
+    r = coo_result.T.todense()
     points = []
     map_old_new_point_ind = {}
-    enc_coo_non_zero_instances = []
+    coo_non_zero_instances = []
     for itr in range(len(inverse_enc_coo_result)):
         if (inverse_enc_coo_result[itr] != 0.0).any():
             points.append(summary_pcd_points[itr])
             pair = {itr: (len(points) - 1)}
             map_old_new_point_ind.update(pair)
-            enc_coo_non_zero_instances.append(enc_coo_result[itr])
+            coo_non_zero_instances.append(r[itr])
 
-    return points, map_old_new_point_ind, enc_coo_non_zero_instances
+    return points, map_old_new_point_ind, coo_non_zero_instances
 
 
 def print_instances(enc_coo, enc, start, end):
