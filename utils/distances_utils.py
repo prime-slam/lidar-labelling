@@ -60,7 +60,7 @@ def calculate_distances(inverse_enc_coo_non_zero_instances):
     return distances
 
 
-def _sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta):
+def sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta):
     mask = np.where(spatial_distance <= proximity_threshold)
 
     # Initialize the distance matrix with zeros
@@ -91,5 +91,4 @@ def _sam_label_distance(sam_features, spatial_distance, proximity_threshold, bet
 def print_pairwise_distances(distances, start, end):
     for first in range(start, end):
         for second in range(first + 1, end):
-            if distances[first, second] != 2:
-                print("distance between {} and {} = {}".format(first, second, distances[first, second]))
+            print("distance between {} and {} = {}".format(first, second, distances[first, second]))

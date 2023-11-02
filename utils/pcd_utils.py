@@ -48,7 +48,6 @@ def paired_association(cam_name, pcd_dataset, target_cloud_index, src_cloud_inde
 
     if len(pcd_combined.points) == 0:
         pcd_combined += target_cloud
-
     pcd_combined += src_cloud
 
     return pcd_combined
@@ -71,7 +70,7 @@ def visualize_by_clusters(clusters, pcd):
     colors = []
     for i in range(len(np.asarray(pcd.points))):
         index = find_point_in_clusters(clusters, pcd.points[i])
-        colors.append(random_colors[index + 1 if index != 1000 else 0])
+        colors.append(random_colors[index + 1 if index != 10000 else 0])
 
     pcd.colors = o3d.utility.Vector3dVector(np.vstack(colors) / 255)
     return pcd
@@ -83,28 +82,10 @@ def find_point_in_clusters(clusters, point):
         for itr2 in range(len(cluster)):
             if (cluster[itr2] == point).all():
                 return itr
-    return 1000
+    return 10000
 
 
-def find_points_in_sphere(src_points, R, enc_coo_non_zero_instances):
-    x0, y0, z0 = find_center_of_sphere(src_points)
-
-    points_in_sphere = []
-    enc_coo_non_zero_instances_points_in_sphere = []
-    for itr in range(len(src_points)):
-        point = src_points[itr]
-        dx = (point[0] - x0) ** 2
-        dy = (point[1] - y0) ** 2
-        dz = (point[2] - z0) ** 2
-
-        if dx + dy + dz <= R ** 2:
-            points_in_sphere.append(point)
-            enc_coo_non_zero_instances_points_in_sphere.append(enc_coo_non_zero_instances[itr])
-
-    return points_in_sphere, enc_coo_non_zero_instances_points_in_sphere
-
-
-def find_points_in_sphere2(src_points, R, arr):
+def find_points_in_sphere(src_points, R, arr):
     x0, y0, z0 = find_center_of_sphere(src_points)
 
     q = np.vstack(arr)
@@ -135,25 +116,3 @@ def find_center_of_sphere(points):
     z0 = z / len(points)
     print("central point = ({}, {}, {})".format(x0, y0, z0))
     return x0, y0, z0
-
-
-def visualize_from_one_hot_encoding(encoding_matrix, enc, pcds, start_index, view_index):
-    instances = enc.inverse_transform(encoding_matrix)
-    print(instances[40])
-    print(instances[40][view_index - start_index])
-    print(len(instances))
-    print(pcds[view_index - start_index])
-
-    pcd = pcds[view_index - start_index]
-
-    random_colors = generate_random_colors(500)
-
-    colors = []
-
-    for i in range(len(np.asarray(pcd.points))):
-        colors.append(random_colors[int(instances[i][view_index - start_index])])
-
-    print(len(colors))
-    pcd.colors = o3d.utility.Vector3dVector(np.vstack(colors) / 255)
-
-    return pcd
