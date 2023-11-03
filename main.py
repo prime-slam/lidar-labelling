@@ -33,9 +33,9 @@ def main1():
 
 
 def main():
-    dataset_path = 'dataset/'
+    dataset_path = 'dataset_baby/'
     sequence = '00'
-    sam_labels_path = Path.cwd().joinpath('pipeline', 'vfm-labels', 'sam', sequence)
+    sam_labels_path = Path.cwd().joinpath('pipeline_baby', 'vfm-labels', 'sam', sequence)
     kitti = KittiDataset(dataset_path, sequence, sam_labels_path)
     sm = SimpleMapping(kitti)
 
