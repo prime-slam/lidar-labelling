@@ -31,8 +31,14 @@ class KittiDataset(AbstractDataset):
         points = self.dataset.get_velo(index)[:, :3]
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
-
         return pcd
+
+    def get_lidar_pose(self, index):
+        return (
+                np.linalg.inv(self.get_camera_extrinsics('cam0'))
+                @ self.dataset.poses[index]
+                @ self.get_camera_extrinsics('cam0')
+        )
 
     def get_camera_names(self):
         return ['cam0', 'cam1', 'cam2', 'cam3']

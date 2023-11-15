@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import numpy as np
 import open3d as o3d
 
@@ -22,61 +23,95 @@ def visualize_pcd(pcd):
     o3d.visualization.draw_geometries([pcd])
 
 
-def get_point_map(cam_name, pcd_dataset, start_index, end_index):
-    base_cloud_index = start_index
-
-    pcd_combined = o3d.geometry.PointCloud()
-    for current_cloud_index in range(start_index + 1, end_index):
-        pcd_combined = paired_association(
-            cam_name,
-            pcd_dataset,
-            base_cloud_index,
-            current_cloud_index,
-            pcd_combined
-        )
-
-    return pcd_combined
+def get_subpcd(pcd, indices):
+    subpcd = o3d.geometry.PointCloud()
+    subpcd.points = o3d.utility.Vector3dVector(np.asarray(pcd.points)[indices])
+    return subpcd
 
 
-def paired_association(cam_name, pcd_dataset, target_cloud_index, src_cloud_index, pcd_combined):
-    target_cloud = pcd_dataset.get_point_cloud(target_cloud_index)
-    src_cloud = pcd_dataset.get_point_cloud(src_cloud_index)
+# Строим карту в системе координат L0 (я думаю K0)
+def build_map_wc(dataset, cam_name, start_index, end_index):
+    map_wc = o3d.geometry.PointCloud()
 
-    matrix_src_cloud_to_target = pcd_dataset.calculate_pcd_motion_matrix(cam_name, src_cloud_index, target_cloud_index)
+    for i in range(start_index, end_index):
+        T = dataset.get_lidar_pose(i)
+        map_wc += copy.deepcopy(dataset.get_point_cloud(i)).transform(T)
 
-    src_cloud.transform(matrix_src_cloud_to_target)
-
-    if len(pcd_combined.points) == 0:
-        pcd_combined += target_cloud
-    pcd_combined += src_cloud
-
-    return pcd_combined
+    return map_wc
 
 
-def remove_hidden_points(pcd_prepared):
+def build_map_wc_triangle_mesh(dataset, cam_name, start_index, end_index, visualize=False):
+    map_wc = o3d.geometry.PointCloud()
+
+    geometries = []
+    for i in range(start_index, end_index):
+        T = dataset.get_lidar_pose(i)
+        # Сдвигаем все облака в систему координат L0 (я думаю K0)
+        map_wc += copy.deepcopy(dataset.get_point_cloud(i)).transform(T)
+
+        m = o3d.geometry.TriangleMesh.create_coordinate_frame()
+        # Положение камеры в системе координат L0 (я думаю K0)
+        T_cam = T @ np.linalg.inv(dataset.get_camera_extrinsics(cam_name))
+        geometries.append(m.transform(T_cam))
+
+    if visualize:
+        # Визуализируем карту и расположение камеры относительно нее    
+        o3d.visualization.draw_geometries([map_wc] + geometries)
+
+    return map_wc, geometries
+
+
+# pcd_centered -- облако в системе координат камеры
+def get_visible_points(pcd_centered, visualize=False):
     diameter = np.linalg.norm(
-        np.asarray(pcd_prepared.get_max_bound()) - np.asarray(pcd_prepared.get_min_bound())
+        np.asarray(pcd_centered.get_max_bound()) - np.asarray(pcd_centered.get_min_bound())
     )
     camera = [0, 0, 0]
     radius = diameter * 100
-    _, pt_map = pcd_prepared.hidden_point_removal(camera, radius)
 
-    return pcd_prepared.select_by_index(pt_map), pt_map
+    _, indices_visible = pcd_centered.hidden_point_removal(camera, radius)
+
+    if visualize:
+        pcd_visible = pcd_centered.select_by_index(indices_visible)
+        m = o3d.geometry.TriangleMesh.create_coordinate_frame()
+        o3d.visualization.draw_geometries([pcd_visible, m])
+
+    return indices_visible
 
 
-def visualize_by_clusters(clusters, pcd):
+# center -- pose around what point to take sphere 
+def get_close_point_indices(pcd, center, R):
+    pcd_centered = copy.deepcopy(pcd).transform(np.linalg.inv(center))
+    
+    points = np.asarray(pcd_centered.points)
+    dists = np.linalg.norm(points, axis=1)
+    return np.where(dists < R)[0]
+
+
+def color_pcd_by_labels(pcd, labels):
+    colors = generate_random_colors(len(labels) + 1)
+    pcd_colored = copy.deepcopy(pcd)
+    pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
+
+    for i in range(len(pcd_colored.points)):
+        pcd_colored.colors[i] = colors[labels[i]]
+
+    return pcd_colored
+
+
+def color_pcd_by_clusters(pcd, clusters):
     random_colors = generate_random_colors(len(clusters) + 1)
+    pcd_colored = copy.deepcopy(pcd)
+    pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
 
-    colors = []
-    for i in range(len(np.asarray(pcd.points))):
-        index = find_point_in_clusters(clusters, pcd.points[i])
-        colors.append(random_colors[index + 1 if index != 10000 else 0])
+    for i in range(len(pcd_colored.points)):
+        index = find_point_in_clusters(pcd.points[i], clusters)
+        pcd_colored.colors[i] = random_colors[index + 1 if index != 10000 else 0]
 
-    pcd.colors = o3d.utility.Vector3dVector(np.vstack(colors) / 255)
-    return pcd
+    return pcd_colored
 
 
-def find_point_in_clusters(clusters, point):
+def find_point_in_clusters(point, clusters):
     for itr in range(len(clusters)):
         cluster = clusters[itr]
         for itr2 in range(len(cluster)):
@@ -85,34 +120,13 @@ def find_point_in_clusters(clusters, point):
     return 10000
 
 
-def find_points_in_sphere(src_points, R, arr):
-    x0, y0, z0 = find_center_of_sphere(src_points)
+# def color_pcd_voxel_down_by_clusters(pcd_voxel_down, pcd_src, clusters, nei):
+#     random_colors = generate_random_colors(len(clusters) + 1)
+#     pcd_colored = copy.deepcopy(pcd_src)
+#     pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd_src.points).shape))
 
-    q = np.vstack(arr)
-    points_in_sphere = []
-    coo_non_zero_instances_points_in_sphere = []
-    for itr in range(len(src_points)):
-        point = src_points[itr]
-        dx = (point[0] - x0) ** 2
-        dy = (point[1] - y0) ** 2
-        dz = (point[2] - z0) ** 2
+#     for i in range(len(pcd_colored.points)):
+#         index = find_point_in_clusters(pcd.points[i], clusters)
+#         pcd_colored.colors[i] = random_colors[index + 1 if index != 10000 else nei[i]]
 
-        if dx + dy + dz <= R ** 2:
-            points_in_sphere.append(point)
-            coo_non_zero_instances_points_in_sphere.append(q[itr])
-
-    return np.vstack(points_in_sphere), np.vstack(coo_non_zero_instances_points_in_sphere)
-
-
-def find_center_of_sphere(points):
-    x, y, z = 0, 0, 0
-    for point in range(len(points)):
-        x += points[point][0]
-        y += points[point][1]
-        z += points[point][2]
-
-    x0 = x / len(points)
-    y0 = y / len(points)
-    z0 = z / len(points)
-    print("central point = ({}, {}, {})".format(x0, y0, z0))
-    return x0, y0, z0
+#     return pcd_colored

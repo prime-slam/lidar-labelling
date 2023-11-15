@@ -34,6 +34,10 @@ class AbstractDataset(ABC):
     @abstractmethod
     def get_point_cloud(self, index):
         pass
+    
+    @abstractmethod
+    def get_lidar_pose(self, index):
+        pass
 
     @abstractmethod
     def get_camera_names(self):
@@ -55,6 +59,7 @@ class AbstractDataset(ABC):
     def get_camera_extrinsics(self, cam_name):
         pass
 
+    # Ki -> K0
     def get_lidar_poses(self, index, cam_name):
         return (
                 np.linalg.inv(self.get_camera_extrinsics(cam_name))

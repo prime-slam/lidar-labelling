@@ -25,19 +25,12 @@ from constants import DEVICE
 from constants import MODEL_TYPE
 
 
-def visualize_image(image):
-    plt.imshow(image)
-
-
-def format_colors_to_255(colors):
-    return np.array(colors) / 255
-
-
 def generate_random_colors(N):
     colors = [[0, 0, 0]]
     for _ in range(N):
         colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
 
+    colors = np.vstack(colors) / 255
     return colors
 
 
@@ -70,3 +63,6 @@ def get_black_image(src_image):
 
     return black_image
 
+
+def visualize_image(image):
+    plt.imshow(image)
