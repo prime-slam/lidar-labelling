@@ -23,10 +23,10 @@ from utils.pcd_utils import get_subpcd
 from utils.pcd_utils import get_visible_points
 
 
-def get_map_not_zero_in_sphere(kitti, cam_name, start_index, end_index, R, visualize_steps=False, view_ind=1):
+def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, visualize_steps=False, view_ind=1):
     # строим карту и отображение точек в инстансы
-    map_wc = build_map_wc(kitti, cam_name, start_index, end_index)
-    points2instances = build_points2instances_matrix(map_wc, kitti, cam_name, start_index, end_index)
+    map_wc = build_map_wc(dataset, cam_name, start_index, end_index)
+    points2instances = build_points2instances_matrix(map_wc, dataset, cam_name, start_index, end_index)
 
     if visualize_steps:
         map_colored = color_pcd_by_labels(map_wc, points2instances[:, view_ind])
@@ -42,7 +42,7 @@ def get_map_not_zero_in_sphere(kitti, cam_name, start_index, end_index, R, visua
         o3d.visualization.draw_geometries([map_colored])
 
     # оставляем только те точки, которые попали в сферу радиуса R с центром в start_index
-    T_first_cam = kitti.get_lidar_pose(start_index) @ np.linalg.inv(kitti.get_camera_extrinsics(cam_name))
+    T_first_cam = dataset.get_lidar_pose(start_index) @ np.linalg.inv(dataset.get_camera_extrinsics(cam_name))
     close_point_indices = get_close_point_indices(map_not_zero, T_first_cam, R)
     map_final = get_subpcd(map_not_zero, close_point_indices)
     points2instances_final = points2instances_not_zero[close_point_indices]

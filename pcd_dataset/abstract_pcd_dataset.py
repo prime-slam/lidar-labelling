@@ -12,24 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
-
 from abc import ABC, abstractmethod
 
 
 class AbstractDataset(ABC):
     def __init__(self, dataset):
         self._dataset = dataset
-        self._cam_poses = self.dataset.poses
         super().__init__()
 
     @property
     def dataset(self):
         return self._dataset
-
-    @property
-    def cam_poses(self):
-        return self._cam_poses
 
     @abstractmethod
     def get_point_cloud(self, index):
@@ -59,43 +52,29 @@ class AbstractDataset(ABC):
     def get_camera_extrinsics(self, cam_name):
         pass
 
-    # Ki -> K0
-    def get_lidar_poses(self, index, cam_name):
-        return (
-                np.linalg.inv(self.get_camera_extrinsics(cam_name))
-                @ self.cam_poses[index]
-                @ self.get_camera_extrinsics(cam_name)
-        )
+    # def transform_to_pcd0(self, pcd=None, cam_name='cam2', start_pcd_index=0):
+    #     matrix = (
+    #             np.linalg.inv(self.get_camera_extrinsics(cam_name))
+    #             @ self.dataset.poses[start_pcd_index]
+    #             @ self.get_camera_extrinsics(cam_name)
+    #     )
 
-    def prepare_points_before_mapping(self, cam_name, pcd, start_pcd_index, image_index):
-        pcd_L0 = self.transform_to_pcd0(pcd=pcd, cam_name=cam_name, start_pcd_index=start_pcd_index)
-        pcd_Ki = self.transform_pcd0_to_cami_coordinate_system(pcd=pcd_L0, i=image_index)
+    #     return pcd.transform(matrix)
 
-        return pcd_Ki
+    # def transform_pcd0_to_cami_coordinate_system(self, pcd=None, cam_name='cam2', i=0):
+    #     matrix = np.linalg.inv(self.dataset.poses[i]) @ self.get_camera_extrinsics(cam_name)
 
-    def transform_to_pcd0(self, pcd=None, cam_name='cam2', start_pcd_index=0):
-        matrix = (
-                np.linalg.inv(self.get_camera_extrinsics(cam_name))
-                @ self.cam_poses[start_pcd_index]
-                @ self.get_camera_extrinsics(cam_name)
-        )
+    #     return pcd.transform(matrix)
 
-        return pcd.transform(matrix)
+    # def calculate_pcd_motion_matrix(self, cam_name, src_index, target_index):
+    #     target_cloud_poses = self.dataset.poses[target_index]
+    #     src_cloud_poses = self.dataset.poses[src_index]
 
-    def transform_pcd0_to_cami_coordinate_system(self, pcd=None, cam_name='cam2', i=0):
-        matrix = np.linalg.inv(self.cam_poses[i]) @ self.get_camera_extrinsics(cam_name)
+    #     src_cam_to_target_poses = np.linalg.inv(target_cloud_poses) @ src_cloud_poses
+    #     matrix_src_cloud_to_target = (
+    #             np.linalg.inv(self.get_camera_extrinsics(cam_name))
+    #             @ src_cam_to_target_poses
+    #             @ self.get_camera_extrinsics(cam_name)
+    #     )
 
-        return pcd.transform(matrix)
-
-    def calculate_pcd_motion_matrix(self, cam_name, src_index, target_index):
-        target_cloud_poses = self.cam_poses[target_index]
-        src_cloud_poses = self.cam_poses[src_index]
-
-        src_cam_to_target_poses = np.linalg.inv(target_cloud_poses) @ src_cloud_poses
-        matrix_src_cloud_to_target = (
-                np.linalg.inv(self.get_camera_extrinsics(cam_name))
-                @ src_cam_to_target_poses
-                @ self.get_camera_extrinsics(cam_name)
-        )
-
-        return matrix_src_cloud_to_target
+    #     return matrix_src_cloud_to_target
