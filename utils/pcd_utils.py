@@ -117,16 +117,54 @@ def find_point_in_clusters(point, clusters):
         for itr2 in range(len(cluster)):
             if (cluster[itr2] == point).all():
                 return itr
-    return 10000
+    return -1
 
 
-# def color_pcd_voxel_down_by_clusters(pcd_voxel_down, pcd_src, clusters, nei):
-#     random_colors = generate_random_colors(len(clusters) + 1)
-#     pcd_colored = copy.deepcopy(pcd_src)
-#     pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd_src.points).shape))
+def color_pcd_by_clusters_and_neighbors(pcd_src, clusters, neighbors):
+    random_colors = generate_random_colors(len(clusters) + 1)
+    pcd_colored = copy.deepcopy(pcd_src)
+    pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd_src.points).shape))
 
-#     for i in range(len(pcd_colored.points)):
-#         index = find_point_in_clusters(pcd.points[i], clusters)
-#         pcd_colored.colors[i] = random_colors[index + 1 if index != 10000 else nei[i]]
+    for i in range(len(pcd_colored.points)):
+        index = find_point_in_clusters(pcd_src.points[i], clusters)
 
-#     return pcd_colored
+        if index == -1: # для точки не нашли кластер, значит она была выброшена при voxel_down => красим в цвет соседа
+            index = find_point_in_clusters(neighbors[i], clusters)
+
+        pcd_colored.colors[i] = random_colors[index + 1 if index != -1 else 0]
+
+    return pcd_colored
+
+
+def color_pcd_by_clusters_common(pcd_src, clusters, neighbors):
+    counter1 = 0
+    counter2 = 0
+    random_colors = generate_random_colors(len(clusters) + 1)
+
+    pcd_colored1 = copy.deepcopy(pcd_src)
+    pcd_colored1.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd_src.points).shape))
+
+    for i in range(len(pcd_colored1.points)):
+        index = find_point_in_clusters(pcd_src.points[i], clusters)
+        if index == -1:
+            counter1 += 1
+        pcd_colored1.colors[i] = random_colors[index + 1 if index != -1 else 0]
+
+    
+    pcd_colored2 = copy.deepcopy(pcd_src)
+    pcd_colored2.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd_src.points).shape))
+
+    for i in range(len(pcd_colored2.points)):
+        index = find_point_in_clusters(pcd_src.points[i], clusters)
+
+        if index == -1: # для точки не нашли кластер, значит она была выброшена при voxel_down => красим в цвет соседа
+            index = find_point_in_clusters(neighbors[i], clusters)
+            if index != -1:
+                counter2 += 1
+            # if index == -1:
+            #     counter2 += 1
+            #     print("strange i = {}".format(i))
+
+        pcd_colored2.colors[i] = random_colors[index + 1 if index != -1 else 0]
+
+    return pcd_colored1, pcd_colored2, counter1, counter2
