@@ -24,8 +24,13 @@ from utils.pcd_utils import get_visible_points
 
 
 def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, visualize_steps=False, view_ind=1):
-    # строим карту и отображение точек в инстансы
+    # строим карту
     map_wc = build_map_wc(dataset, cam_name, start_index, end_index)
+
+    if visualize_steps:
+        o3d.visualization.draw_geometries([map_wc])
+
+    # строим отображение точек в инстансы
     points2instances = build_points2instances_matrix(map_wc, dataset, cam_name, start_index, end_index)
 
     if visualize_steps:
@@ -67,6 +72,7 @@ def build_points2instances_matrix(map_wc, dataset, cam_name, start_index, end_in
 
         map_cc = copy.deepcopy(map_wc).transform(np.linalg.inv(T_cam)) # map in camera frame
         indices_visible = get_visible_points(map_cc)
+        # indices_visible = np.array([i for i in range(len(map_cc.points))], dtype=int)
         map_cc_visible = get_subpcd(map_cc, indices_visible)
         
         points_to_pixels = get_points_to_pixels(np.asarray(map_cc_visible.points), 
@@ -77,6 +83,29 @@ def build_points2instances_matrix(map_wc, dataset, cam_name, start_index, end_in
             points2instances[indices_visible[point_id], view_id] = int(image_labels[pixel_id[1], pixel_id[0]])
 
     return points2instances
+
+
+def build_custom_voxel_pcd(pcd, points2instances, voxel_size=0.03):
+    pcd_copy = copy.deepcopy(pcd)
+
+    voxel_trace = pcd_copy.voxel_down_sample_and_trace(voxel_size, 
+                                                       pcd_copy.get_min_bound(), 
+                                                       pcd_copy.get_max_bound(), 
+                                                       True)
+    
+    list_int_vectors = voxel_trace[2]
+
+    # строим кастомное воксель-облако: из набора точек, которые сформировали воксель, берем первую
+    indices = []
+    for i in range(len(list_int_vectors)):
+        int_vector_array = np.asarray(list_int_vectors[i])
+        indices.append(int_vector_array[0])
+    indices = np.asarray(indices)
+
+    voxel_pcd = get_subpcd(pcd_copy, indices)
+    voxel_points2instances = points2instances[indices, :]
+
+    return voxel_pcd, voxel_points2instances, voxel_trace
 
 
 def get_points_to_pixels(points, cam_intrinsics, img_shape):

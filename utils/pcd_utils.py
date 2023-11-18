@@ -161,9 +161,6 @@ def color_pcd_by_clusters_common(pcd_src, clusters, neighbors):
             index = find_point_in_clusters(neighbors[i], clusters)
             if index != -1:
                 counter2 += 1
-            # if index == -1:
-            #     counter2 += 1
-            #     print("strange i = {}".format(i))
 
         pcd_colored2.colors[i] = random_colors[index + 1 if index != -1 else 0]
 
