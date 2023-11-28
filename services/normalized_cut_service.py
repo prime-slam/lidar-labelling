@@ -67,8 +67,13 @@ def normalized_cut(w, labels, T=0.01):
         index2 = np.argsort(eigvals)[1]
 
         ev = eigvecs[:, index2]
+        print("ev = {}".format(ev))
+        print("D = {}".format(D))
+        print("w = {}".format(w))
         mask, mcut = get_min_ncut(ev, D, w, 10)
-        
+
+        print("mcut = {}".format(mcut))
+
         if mcut < T:
             labels1 = normalized_cut(w[mask][:, mask], labels[mask], T)
             labels2 = normalized_cut(w[~mask][:, ~mask], labels[~mask], T)

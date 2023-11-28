@@ -14,6 +14,7 @@
 
 import copy
 import numpy as np
+import numpy_indexed as npi
 import open3d as o3d
 
 from utils.pcd_utils import build_map_wc
@@ -26,6 +27,7 @@ from utils.pcd_utils import get_visible_points
 def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, visualize_steps=False, view_ind=1):
     # строим карту
     map_wc = build_map_wc(dataset, cam_name, start_index, end_index)
+    print("map_size1={}".format(len(map_wc.points)))
 
     if visualize_steps:
         o3d.visualization.draw_geometries([map_wc])
@@ -41,6 +43,7 @@ def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, vis
     not_zero_indices = get_not_zero_mask(points2instances)
     map_not_zero = get_subpcd(map_wc, not_zero_indices)
     points2instances_not_zero = points2instances[not_zero_indices]
+    print("map_size2={}".format(len(map_not_zero.points)))
 
     if visualize_steps:
         map_colored = color_pcd_by_labels(map_not_zero, points2instances_not_zero[:, view_ind])
@@ -51,12 +54,48 @@ def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, vis
     close_point_indices = get_close_point_indices(map_not_zero, T_first_cam, R)
     map_final = get_subpcd(map_not_zero, close_point_indices)
     points2instances_final = points2instances_not_zero[close_point_indices]
+    print("map_size3={}".format(len(map_final.points)))
 
     if visualize_steps:
         map_colored = color_pcd_by_labels(map_final, points2instances_final[:, view_ind])
         o3d.visualization.draw_geometries([map_colored])
 
     return map_final, points2instances_final
+
+
+def build_o3d_voxel_pcd(map, points2instances, start_index, end_index, voxel_size=0.03, print_test_output=False):
+    map_copy = copy.deepcopy(map)
+
+    min_bound = map_copy.get_min_bound()
+    max_bound = map_copy.get_max_bound()
+
+    downpcd_trace = map_copy.voxel_down_sample_and_trace(voxel_size, min_bound, max_bound, True)
+
+    downpcd = downpcd_trace[0]
+    list_int_vectors = downpcd_trace[2]
+    image_count = end_index - start_index
+    upd_points2instances = np.zeros((len(list_int_vectors), image_count), dtype=int)
+
+    k = 0
+    for i in range(len(list_int_vectors)):
+        int_vector_array = np.asarray(list_int_vectors[i])
+        instances = []
+        for j in range(len(int_vector_array)):
+            instances.append(points2instances[int_vector_array[j]])
+        instances_array = np.asarray(instances)
+        
+        voxel_instance = npi.mode(instances_array)
+
+        upd_points2instances[i] = voxel_instance
+
+        if print_test_output and len(instances_array) > 1 and k < 100:
+            print("i = {}".format(i))
+            print("instances_array = {}".format(instances_array))
+            print("voxel_instance = {}".format(voxel_instance))
+            print("_______")
+            k += 1
+
+    return downpcd, upd_points2instances, downpcd_trace
 
 
 def build_points2instances_matrix(map_wc, dataset, cam_name, start_index, end_index):
