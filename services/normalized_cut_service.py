@@ -51,7 +51,7 @@ def get_min_ncut(ev, d, w, num_cuts):
     return min_mask, mcut
 
 
-def normalized_cut(w, labels, T=0.01):
+def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
     W = w + sparse.identity(w.shape[0])
 
     if W.shape[0] > 2:
@@ -62,7 +62,7 @@ def normalized_cut(w, labels, T=0.01):
 
         A = D2 * (D - W) * D2
 
-        eigvals, eigvecs = sparse.linalg.eigsh(A, 2, sigma=0, which='LM')
+        eigvals, eigvecs = sparse.linalg.eigsh(A, eigenvalues_count, sigma=0, which='LM')
 
         index2 = np.argsort(eigvals)[1]
 
@@ -75,8 +75,8 @@ def normalized_cut(w, labels, T=0.01):
         print("mcut = {}".format(mcut))
 
         if mcut < T:
-            labels1 = normalized_cut(w[mask][:, mask], labels[mask], T)
-            labels2 = normalized_cut(w[~mask][:, ~mask], labels[~mask], T)
+            labels1 = normalized_cut(w[mask][:, mask], labels[mask], T, eigenvalues_count)
+            labels2 = normalized_cut(w[~mask][:, ~mask], labels[~mask], T, eigenvalues_count)
             return labels1 + labels2
         else:
             return [labels]

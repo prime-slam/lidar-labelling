@@ -67,7 +67,7 @@ def get_visible_points(pcd_centered, visualize=False):
         np.asarray(pcd_centered.get_max_bound()) - np.asarray(pcd_centered.get_min_bound())
     )
     camera = [0, 0, 0]
-    radius = diameter * 100
+    radius = diameter * 10000
 
     _, indices_visible = pcd_centered.hidden_point_removal(camera, radius)
 

@@ -33,7 +33,9 @@ def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, vis
         o3d.visualization.draw_geometries([map_wc])
 
     # строим отображение точек в инстансы
-    points2instances = build_points2instances_matrix(map_wc, dataset, cam_name, start_index, end_index)
+    start_image_index = start_index - 3
+    end_image_index = end_index
+    points2instances = build_points2instances_matrix(map_wc, dataset, cam_name, start_image_index, end_image_index)
 
     if visualize_steps:
         map_colored = color_pcd_by_labels(map_wc, points2instances[:, view_ind])
@@ -73,7 +75,7 @@ def build_o3d_voxel_pcd(map, points2instances, start_index, end_index, voxel_siz
 
     downpcd = downpcd_trace[0]
     list_int_vectors = downpcd_trace[2]
-    image_count = end_index - start_index
+    image_count = end_index - start_index + 3
     upd_points2instances = np.zeros((len(list_int_vectors), image_count), dtype=int)
 
     k = 0
@@ -98,11 +100,11 @@ def build_o3d_voxel_pcd(map, points2instances, start_index, end_index, voxel_siz
     return downpcd, upd_points2instances, downpcd_trace
 
 
-def build_points2instances_matrix(map_wc, dataset, cam_name, start_index, end_index):
+def build_points2instances_matrix(map_wc, dataset, cam_name, start_image_index, end_image_index):
     N = np.asarray(map_wc.points).shape[0]
-    points2instances = np.zeros((N, end_index - start_index), dtype=int)
+    points2instances = np.zeros((N, end_image_index - start_image_index), dtype=int)
 
-    for view_id, view in enumerate(range(start_index, end_index)):
+    for view_id, view in enumerate(range(start_image_index, end_image_index)):
         masks = dataset.get_image_instances(cam_name, view)
         image_labels = masks_to_image(masks)
         
