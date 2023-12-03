@@ -29,6 +29,12 @@ def get_subpcd(pcd, indices):
     return subpcd
 
 
+def remove_stat_outlier(pcd, nb_neighbors=25, std_ratio=5.0):
+    pcd_copy = copy.deepcopy(pcd)
+    pcd_result, indices = pcd_copy.remove_statistical_outlier(nb_neighbors, std_ratio)
+    return pcd_result, indices
+
+
 # Строим карту в системе координат L0 (я думаю K0)
 def build_map_wc(dataset, cam_name, start_index, end_index):
     map_wc = o3d.geometry.PointCloud()
