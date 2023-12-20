@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import numpy as np
 
 
@@ -43,7 +44,14 @@ def sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta
     return label_distance, mask
 
 
-def remove_isolated_points(dist, points):
-    mask = np.any(dist - np.eye(dist.shape[0]) != 0, axis=1)
+def remove_isolated_points(dist, points, trace):
+    mask_isolated = np.all(dist - np.eye(dist.shape[0]) == 0, axis=1)
+    isolated_points = np.array([i for i in range(len(points))], dtype=int)[mask_isolated]
+
+    trace_copy = copy.deepcopy(trace)
+    for index in isolated_points:
+        del trace_copy[index]
+
+    mask_not_isolated = np.any(dist - np.eye(dist.shape[0]) != 0, axis=1)
     
-    return dist[mask][:, mask], points[mask]
+    return dist[mask_not_isolated][:, mask_not_isolated], points[mask_not_isolated], trace_copy

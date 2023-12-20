@@ -67,7 +67,6 @@ def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
         index2 = np.argsort(eigvals)[1]
 
         ev = eigvecs[:, index2]
-        print("ev = {}".format(ev))
         
         mask, mcut = get_min_ncut(ev, D, w, 10)
         print("mcut = {}".format(mcut))

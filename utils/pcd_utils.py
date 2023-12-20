@@ -105,12 +105,10 @@ def color_pcd_by_labels(pcd, labels):
     return pcd_colored
 
 
-def color_pcd_by_clusters_and_voxels(pcd, voxel_pcd, voxel_trace, clusters):
+def color_pcd_by_clusters_and_voxels(pcd, trace, clusters):
     random_colors = generate_random_colors(len(clusters) + 1)
     pcd_colored = copy.deepcopy(pcd)
     pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
-
-    trace = voxel_trace[2]
 
     for i in range(len(clusters)):
         cluster = clusters[i]

@@ -65,7 +65,7 @@ def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, vis
     return map_final, points2instances_final
 
 
-def build_o3d_voxel_pcd(map, points2instances, start_index, end_index, voxel_size=0.03, print_test_output=False):
+def build_o3d_voxel_pcd(map, points2instances, start_index, end_index, voxel_size=0.05):
     map_copy = copy.deepcopy(map)
 
     min_bound = map_copy.get_min_bound()
@@ -78,7 +78,6 @@ def build_o3d_voxel_pcd(map, points2instances, start_index, end_index, voxel_siz
     image_count = end_index - start_index + 3
     upd_points2instances = np.zeros((len(list_int_vectors), image_count), dtype=int)
 
-    k = 0
     for i in range(len(list_int_vectors)):
         int_vector_array = np.asarray(list_int_vectors[i])
         instances = []
@@ -89,13 +88,6 @@ def build_o3d_voxel_pcd(map, points2instances, start_index, end_index, voxel_siz
         voxel_instance = npi.mode(instances_array)
 
         upd_points2instances[i] = voxel_instance
-
-        if print_test_output and len(instances_array) > 1 and k < 100:
-            print("i = {}".format(i))
-            print("instances_array = {}".format(instances_array))
-            print("voxel_instance = {}".format(voxel_instance))
-            print("_______")
-            k += 1
 
     return downpcd, upd_points2instances, downpcd_trace
 
