@@ -85,12 +85,16 @@ def get_visible_points(pcd_centered, visualize=False):
     return indices_visible
 
 
-# center -- pose around what point to take sphere 
-def get_close_point_indices(pcd, center, R):
+# center -- pose around what point to take cube
+def get_close_point_indices_cube(pcd, center, central_point_in_cube, R):
     pcd_centered = copy.deepcopy(pcd).transform(np.linalg.inv(center))
-    
     points = np.asarray(pcd_centered.points)
-    dists = np.linalg.norm(points, axis=1)
+
+    z = central_point_in_cube[2]
+
+    vectors = np.array([[0, 0, z - point[2]] for point in points])
+    dists = np.linalg.norm(vectors, axis=1)
+
     return np.where(dists < R)[0]
 
 

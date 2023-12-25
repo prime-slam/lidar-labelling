@@ -19,12 +19,12 @@ import open3d as o3d
 
 from utils.pcd_utils import build_map_wc
 from utils.pcd_utils import color_pcd_by_labels
-from utils.pcd_utils import get_close_point_indices
+from utils.pcd_utils import get_close_point_indices_cube
 from utils.pcd_utils import get_subpcd
 from utils.pcd_utils import get_visible_points
 
 
-def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, visualize_steps=False, view_ind=1):
+def get_map_not_zero_in_cube(dataset, cam_name, start_index, end_index, R, visualize_steps=False, view_ind=0):
     # строим карту
     map_wc = build_map_wc(dataset, cam_name, start_index, end_index)
     print("map_size1={}".format(len(map_wc.points)))
@@ -51,9 +51,10 @@ def get_map_not_zero_in_sphere(dataset, cam_name, start_index, end_index, R, vis
         map_colored = color_pcd_by_labels(map_not_zero, points2instances_not_zero[:, view_ind])
         o3d.visualization.draw_geometries([map_colored])
 
-    # оставляем только те точки, которые попали в сферу радиуса R с центром в start_index
+    # оставляем только те точки, которые попали в куб со стороной R с центром в start_index
+    central_point_in_cube = dataset.get_lidar_pose(start_index)[:3,3]
     T_first_cam = dataset.get_lidar_pose(start_index) @ np.linalg.inv(dataset.get_camera_extrinsics(cam_name))
-    close_point_indices = get_close_point_indices(map_not_zero, T_first_cam, R)
+    close_point_indices = get_close_point_indices_cube(map_not_zero, T_first_cam, central_point_in_cube, R)
     map_final = get_subpcd(map_not_zero, close_point_indices)
     points2instances_final = points2instances_not_zero[close_point_indices]
     print("map_size3={}".format(len(map_final.points)))
