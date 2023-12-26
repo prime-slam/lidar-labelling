@@ -41,9 +41,9 @@ class InitInstancesMatrixProcessor:
             image_labels = self.masks_to_image(masks)
             
             T = dataset.get_lidar_pose(view)
-            T_cam = T @ np.linalg.inv(dataset.get_camera_extrinsics(cam_name))
+            T_cam = T @ np.linalg.inv(dataset.get_camera_extrinsics(cam_name)) #TODO L0????
 
-            map_cc = copy.deepcopy(map_wc).transform(np.linalg.inv(T_cam)) # map in camera frame
+            map_cc = copy.deepcopy(map_wc).transform(np.linalg.inv(T_cam)) # map in camera frame #TODO типа из L0 в Ki???
             indices_visible = get_visible_points(map_cc)
             map_cc_visible = get_subpcd(map_cc, indices_visible)
             

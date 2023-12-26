@@ -12,14 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
+import open3d as o3d
 import zope.interface
 
 from services.preprocessing.common.interface import IProcessor
-from utils.pcd_utils import build_map_wc
 
 
 @zope.interface.implementer(IProcessor)
 class InitMapProcessor:
 
+    # Строим карту в системе координат L0
     def process(self, config, pcd=None, points2instances=None):
-        return build_map_wc(config.dataset, config.cam_name, config.start_index, config.end_index)
+        map_wc = o3d.geometry.PointCloud()
+
+        dataset = config.dataset
+
+        for i in range(config.start_index, config.end_index):
+            T = dataset.get_lidar_pose(i)
+            map_wc += copy.deepcopy(dataset.get_point_cloud(i)).transform(T)
+
+        return map_wc

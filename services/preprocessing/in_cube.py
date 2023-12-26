@@ -31,7 +31,7 @@ class SelectionInCubeProcessor:
         T_first_cam = (
             dataset.get_lidar_pose(config.start_index) 
             @ np.linalg.inv(dataset.get_camera_extrinsics(config.cam_name))
-        )
+        ) #TODO из L_start в K0, верно???
 
         close_point_indices = get_close_point_indices_cube(pcd, T_first_cam, central_point_in_cube, config.R)
 
