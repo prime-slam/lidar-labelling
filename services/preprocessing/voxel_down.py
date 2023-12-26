@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import numpy as np
+import numpy_indexed as npi
 import zope.interface
 
 from services.preprocessing.common.interface import IProcessor
@@ -37,7 +39,7 @@ class VoxelDownProcessor:
 
         downpcd = downpcd_trace[0]
         list_int_vectors = downpcd_trace[2]
-        
+
         image_count = end_index - start_index + image_offset
         upd_points2instances = np.zeros((len(list_int_vectors), image_count), dtype=int)
 
