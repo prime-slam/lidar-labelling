@@ -16,7 +16,7 @@ import copy
 import numpy as np
 
 
-def sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta):
+def sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta, alpha):
     mask = np.where(spatial_distance <= proximity_threshold)
 
     # Initialize the distance matrix with zeros
@@ -39,7 +39,7 @@ def sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta
             distance_matrix[point2, point1] = distance_matrix[point1, point2]
 
     mask = np.where(spatial_distance <= proximity_threshold, 1, 0)
-    label_distance = mask * np.exp(-beta * distance_matrix)
+    label_distance = mask * np.exp(-beta * distance_matrix) * np.exp(-alpha * spatial_distance)
 
     return label_distance, mask
 

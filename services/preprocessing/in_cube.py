@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import numpy as np
 import zope.interface
 
@@ -24,18 +25,25 @@ from utils.pcd_utils import get_subpcd
 class SelectionInCubeProcessor:
 
     def process(self, config, pcd, points2instances):
-        dataset = config.dataset
-
-        central_point_in_cube = dataset.get_lidar_pose(config.start_index)[:3,3]
-
         T_first_cam = (
-            dataset.get_lidar_pose(config.start_index) 
-            @ np.linalg.inv(dataset.get_camera_extrinsics(config.cam_name))
-        ) #TODO из L_start в K0, верно???
+            config.dataset.get_lidar_pose(config.start_index) 
+            @ np.linalg.inv(config.dataset.get_camera_extrinsics(config.cam_name))
+        )
 
-        close_point_indices = get_close_point_indices_cube(pcd, T_first_cam, central_point_in_cube, config.R)
+        close_point_indices = self.get_close_point_indices_cube(pcd, T_first_cam, config.R)
 
         pcd_in_cube = get_subpcd(pcd, close_point_indices)
         points2instances_in_cube = points2instances[close_point_indices]
 
         return pcd_in_cube, points2instances_in_cube
+
+
+    # center -- pose around what point to take cube
+    def get_close_point_indices_cube(self, pcd, center, R):
+        pcd_centered = copy.deepcopy(pcd).transform(np.linalg.inv(center))
+        points = np.asarray(pcd_centered.points)
+
+        vectors = np.array([[0, 0, point[2]] for point in points])
+        dists = np.linalg.norm(vectors, axis=1)
+
+        return np.where(dists < R)[0]
