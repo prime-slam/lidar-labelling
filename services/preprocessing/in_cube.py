@@ -17,7 +17,6 @@ import numpy as np
 import zope.interface
 
 from services.preprocessing.common.interface import IProcessor
-from utils.pcd_utils import get_close_point_indices_cube
 from utils.pcd_utils import get_subpcd
 
 
