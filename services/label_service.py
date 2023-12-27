@@ -119,29 +119,6 @@ def build_points2instances_matrix(map_wc, dataset, cam_name, start_image_index, 
     return points2instances
 
 
-def build_custom_voxel_pcd(pcd, points2instances, voxel_size=0.03):
-    pcd_copy = copy.deepcopy(pcd)
-
-    voxel_trace = pcd_copy.voxel_down_sample_and_trace(voxel_size, 
-                                                       pcd_copy.get_min_bound(), 
-                                                       pcd_copy.get_max_bound(), 
-                                                       True)
-    
-    list_int_vectors = voxel_trace[2]
-
-    # строим кастомное воксель-облако: из набора точек, которые сформировали воксель, берем первую
-    indices = []
-    for i in range(len(list_int_vectors)):
-        int_vector_array = np.asarray(list_int_vectors[i])
-        indices.append(int_vector_array[0])
-    indices = np.asarray(indices)
-
-    voxel_pcd = get_subpcd(pcd_copy, indices)
-    voxel_points2instances = points2instances[indices, :]
-
-    return voxel_pcd, voxel_points2instances, voxel_trace
-
-
 def get_points_to_pixels(points, cam_intrinsics, img_shape):
     img_width, img_height = img_shape
 

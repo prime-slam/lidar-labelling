@@ -35,7 +35,7 @@ def remove_statistical_outlier_points(pcd, nb_neighbors=25, std_ratio=5.0):
     return pcd_result, indices
 
 
-# Строим карту в системе координат L0 (я думаю K0)
+# Строим карту в системе координат L0
 def build_map_wc(dataset, cam_name, start_index, end_index):
     map_wc = o3d.geometry.PointCloud()
 
@@ -52,11 +52,11 @@ def build_map_wc_triangle_mesh(dataset, cam_name, start_index, end_index, visual
     geometries = []
     for i in range(start_index, end_index):
         T = dataset.get_lidar_pose(i)
-        # Сдвигаем все облака в систему координат L0 (я думаю K0)
+        # Сдвигаем все облака в систему координат L0
         map_wc += copy.deepcopy(dataset.get_point_cloud(i)).transform(T)
 
         m = o3d.geometry.TriangleMesh.create_coordinate_frame()
-        # Положение камеры в системе координат L0 (я думаю K0)
+        # Положение камеры в системе координат L0
         T_cam = T @ np.linalg.inv(dataset.get_camera_extrinsics(cam_name))
         geometries.append(m.transform(T_cam))
 
@@ -83,19 +83,6 @@ def get_visible_points(pcd_centered, visualize=False):
         o3d.visualization.draw_geometries([pcd_visible, m])
 
     return indices_visible
-
-
-# center -- pose around what point to take cube
-def get_close_point_indices_cube(pcd, center, central_point_in_cube, R):
-    pcd_centered = copy.deepcopy(pcd).transform(np.linalg.inv(center))
-    points = np.asarray(pcd_centered.points)
-
-    z = central_point_in_cube[2]
-
-    vectors = np.array([[0, 0, z - point[2]] for point in points])
-    dists = np.linalg.norm(vectors, axis=1)
-
-    return np.where(dists < R)[0]
 
 
 # labels -- строка в матрице инстансов
