@@ -17,6 +17,22 @@ import numpy as np
 
 
 def sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta, alpha):
+    """Calculating a matrix of distances between points based on preliminary labeling and physical distance between points.
+
+    Parameters
+    ----------
+    sam_features : matrix
+        instance matrix
+    spatial_distance : matrix
+        physical distance between cloud points
+    proximity_threshold : int
+        threshold value of the distance between close points
+    beta : int
+        parameter to increase the spread of distance values in the final calculation (part with distance between instances)
+    alpha : int 
+        parameter to increase the spread of distance values in the final calculation (part with physical distance)
+    """
+
     mask = np.where(spatial_distance <= proximity_threshold)
 
     # Initialize the distance matrix with zeros
@@ -45,6 +61,8 @@ def sam_label_distance(sam_features, spatial_distance, proximity_threshold, beta
 
 
 def remove_isolated_points(dist, points, trace):
+    """Removing isolated points that have all 0s in the distance matrix except the diagonal element"""
+
     mask_isolated = np.all(dist - np.eye(dist.shape[0]) == 0, axis=1)
     isolated_points = np.array([i for i in range(len(points))], dtype=int)[mask_isolated]
 

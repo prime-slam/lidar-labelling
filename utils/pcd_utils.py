@@ -35,40 +35,39 @@ def remove_statistical_outlier_points(pcd, nb_neighbors=25, std_ratio=5.0):
     return pcd_result, indices
 
 
-# Строим карту в системе координат L0
-def build_map_wc(dataset, cam_name, start_index, end_index):
-    map_wc = o3d.geometry.PointCloud()
-
-    for i in range(start_index, end_index):
-        T = dataset.get_lidar_pose(i)
-        map_wc += copy.deepcopy(dataset.get_point_cloud(i)).transform(T)
-
-    return map_wc
-
-
 def build_map_wc_triangle_mesh(dataset, cam_name, start_index, end_index, visualize=False):
     map_wc = o3d.geometry.PointCloud()
 
     geometries = []
     for i in range(start_index, end_index):
         T = dataset.get_lidar_pose(i)
-        # Сдвигаем все облака в систему координат L0
+        # Shift the cloud to the world coordinate system
         map_wc += copy.deepcopy(dataset.get_point_cloud(i)).transform(T)
 
         m = o3d.geometry.TriangleMesh.create_coordinate_frame()
-        # Положение камеры в системе координат L0
+        # Camera position in the world coordinate system
         T_cam = T @ np.linalg.inv(dataset.get_camera_extrinsics(cam_name))
         geometries.append(m.transform(T_cam))
 
     if visualize:
-        # Визуализируем карту и расположение камеры относительно нее    
+        # Visualize the map and the location of the camera relative to it 
         o3d.visualization.draw_geometries([map_wc] + geometries)
 
     return map_wc, geometries
 
 
-# pcd_centered -- облако в системе координат камеры
 def get_visible_points(pcd_centered, visualize=False):
+    """Removing hidden points
+
+    Parameters
+    ----------
+    pcd_centered : open3d.geometry.PointCloud
+        pcd in the camera coordinate system
+    visualize : boolean
+        true, if visualization of the result is required.
+        false, otherwise
+    """
+
     diameter = np.linalg.norm(
         np.asarray(pcd_centered.get_max_bound()) - np.asarray(pcd_centered.get_min_bound())
     )
@@ -85,8 +84,17 @@ def get_visible_points(pcd_centered, visualize=False):
     return indices_visible
 
 
-# labels -- строка в матрице инстансов
 def color_pcd_by_labels(pcd, labels):
+    """Cloud coloring after constructing an instance matrix by labels colors
+
+    Parameters
+    ----------
+    pcd : open3d.geometry.PointCloud
+        cloud for coloring
+    labels : numpy.array
+        row in the instance matrix
+    """
+
     colors = generate_random_colors(len(labels) + 1)
     pcd_colored = copy.deepcopy(pcd)
     pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
@@ -98,6 +106,18 @@ def color_pcd_by_labels(pcd, labels):
 
 
 def color_pcd_by_clusters_and_voxels(pcd, trace, clusters):
+    """Cloud coloring after segmentation by colors of labeled clusters
+
+    Parameters
+    ----------
+    pcd : open3d.geometry.PointCloud
+        cloud for coloring
+    trace : list of IntVectors
+        the i-th element stores the indices of the points of the original cloud that formed the i-th voxel
+    clusters : list of lists
+        the i-th element stores the indices of the points of the voxel cloud that fell into the i-th cluster
+    """
+
     random_colors = generate_random_colors(len(clusters) + 1)
     pcd_colored = copy.deepcopy(pcd)
     pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
