@@ -87,7 +87,7 @@ def get_visible_points(pcd_centered, visualize=False):
 
 # center -- pose around what point to take cube
 def get_close_point_indices_cube(pcd, center, central_point_in_cube, R):
-    pcd_centered = copy.deepcopy(pcd).transform(np.linalg.inv(center)) #TODO из K0 в L_start????
+    pcd_centered = copy.deepcopy(pcd).transform(np.linalg.inv(center))
     points = np.asarray(pcd_centered.points)
 
     z = central_point_in_cube[2]
