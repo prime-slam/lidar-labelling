@@ -52,6 +52,8 @@ def get_min_ncut(ev, d, w, num_cuts):
 
 
 def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
+    """Implementation of the GraphCut algorithm for segmentation labels based on a matrix of distances W between them"""
+
     W = w + sparse.identity(w.shape[0])
 
     if W.shape[0] > 2:

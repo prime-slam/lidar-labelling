@@ -17,7 +17,6 @@ import numpy as np
 import zope.interface
 
 from services.preprocessing.common.interface import IProcessor
-from utils.pcd_utils import build_map_wc
 from utils.pcd_utils import get_subpcd
 from utils.pcd_utils import get_visible_points
 
@@ -26,6 +25,12 @@ from utils.pcd_utils import get_visible_points
 class InitInstancesMatrixProcessor:
 
     def process(self, config, pcd, points2instances=None):
+        """Constructing an instance matrix for pcd.
+
+        The pcd is covered with a sequence of images from (config.start_index - config.start_image_index_offset)
+        to config.end_index. The images are already segmented at this point.
+        """
+
         points2instances = self.build_points2instances_matrix(
             pcd, config.dataset, config.cam_name, config.start_index - config.start_image_index_offset, config.end_index
         )
@@ -33,6 +38,15 @@ class InitInstancesMatrixProcessor:
         return points2instances
 
     def build_points2instances_matrix(self, map_wc, dataset, cam_name, start_image_index, end_image_index):
+        """The map is moved to the camera coordinate system at the moment the current image is taken.
+        The function for removing hidden points is called (get_visible_points).
+
+        Cloud points are related to pixels. The instance number of the corresponding pixel is written into 
+        the points2instances matrix for the point and the current image.
+
+        The action is repeated for all images.
+        """
+
         N = np.asarray(map_wc.points).shape[0]
         points2instances = np.zeros((N, end_image_index - start_image_index), dtype=int)
 
@@ -57,6 +71,8 @@ class InitInstancesMatrixProcessor:
         return points2instances
 
     def get_points_to_pixels(self, points, cam_intrinsics, img_shape):
+        """The points of the cloud are matched to the pixels of the image"""
+
         img_width, img_height = img_shape
 
         points_proj = cam_intrinsics @ points.T
@@ -76,6 +92,8 @@ class InitInstancesMatrixProcessor:
         return points_ind_to_pixels
 
     def masks_to_image(self, masks):
+        """Assigning instance numbers for each mask of a segmented image"""
+
         image_labels = np.zeros(masks[0]['segmentation'].shape)
         for i, mask in enumerate(masks):
             image_labels[mask['segmentation']] = i + 1

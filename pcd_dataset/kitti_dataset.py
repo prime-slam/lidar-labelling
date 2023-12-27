@@ -23,6 +23,8 @@ from pcd_dataset.abstract_pcd_dataset import AbstractDataset
 
 
 class KittiDataset(AbstractDataset):
+    """Working with clouds and images from the KITTI dataset, see here: https://www.cvlibs.net/datasets/kitti/eval_odometry.php"""
+
     def __init__(self, dataset_path, sequence, image_instances_path):
         super().__init__(pykitti.odometry(dataset_path, sequence))
         self.image_instances_path = image_instances_path

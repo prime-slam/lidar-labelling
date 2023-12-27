@@ -24,12 +24,20 @@ from services.preprocessing.common.interface import IProcessor
 class VoxelDownProcessor:
 
     def process(self, config, pcd, points2instances):
+        """Downsample input pcd with a voxel"""
+
         return self.build_o3d_voxel_pcd(
             pcd, points2instances, config.start_index, config.end_index, config.start_image_index_offset, config.voxel_size
         )
 
 
     def build_o3d_voxel_pcd(self, pcd, points2instances, start_index, end_index, image_offset, voxel_size):
+        """Open3d function voxel_down_sample_and_trace call.
+
+        Recalculation of the instance matrix for the voxel cloud. The voxel is assigned an instance
+        corresponding to the most frequent instance result among the points that formed the voxel.
+        """
+
         pcd_copy = copy.deepcopy(pcd)
 
         min_bound = pcd_copy.get_min_bound()

@@ -22,14 +22,13 @@ from services.preprocessing.common.interface import IProcessor
 @zope.interface.implementer(IProcessor)
 class InitMapProcessor:
 
-    # Строим карту в системе координат L0
     def process(self, config, pcd=None, points2instances=None):
+        """Combining clouds from config.start_index to config.end_index into a dense map in the world coordinate system"""
+
         map_wc = o3d.geometry.PointCloud()
 
-        dataset = config.dataset
-
         for i in range(config.start_index, config.end_index):
-            T = dataset.get_lidar_pose(i)
-            map_wc += copy.deepcopy(dataset.get_point_cloud(i)).transform(T)
+            T = config.dataset.get_lidar_pose(i)
+            map_wc += copy.deepcopy(config.dataset.get_point_cloud(i)).transform(T)
 
         return map_wc

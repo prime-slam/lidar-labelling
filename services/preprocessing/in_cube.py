@@ -24,6 +24,10 @@ from utils.pcd_utils import get_subpcd
 class SelectionInCubeProcessor:
 
     def process(self, config, pcd, points2instances):
+        """Selection of points inside a cube with a given side.
+        The cube starts from the lidar location at the moment of recording the config.start_index cloud.
+        """
+
         T_first_cam = (
             config.dataset.get_lidar_pose(config.start_index) 
             @ np.linalg.inv(config.dataset.get_camera_extrinsics(config.cam_name))
@@ -37,8 +41,19 @@ class SelectionInCubeProcessor:
         return pcd_in_cube, points2instances_in_cube
 
 
-    # center -- pose around what point to take cube
     def get_close_point_indices_cube(self, pcd, center, R):
+        """Sampling pcd indices inside a cube
+
+        Parameters
+        ----------
+        pcd : open3d.geometry.PointCloud
+            original dense cloud
+        center : matrix
+            pose around what point to take cube
+        R : int
+            side of a cube
+        """
+
         pcd_centered = copy.deepcopy(pcd).transform(np.linalg.inv(center))
         points = np.asarray(pcd_centered.points)
 

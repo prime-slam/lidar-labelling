@@ -23,6 +23,8 @@ from utils.pcd_utils import get_subpcd
 class SelectionNotZeroProcessor:
 
     def process(self, config, pcd, points2instances):
+        """Selection of pcd points that were labeled on at least one image"""
+
         not_zero_indices = self.get_not_zero_mask(points2instances)
         
         pcd_not_zero = get_subpcd(pcd, not_zero_indices)
@@ -31,4 +33,6 @@ class SelectionNotZeroProcessor:
         return pcd_not_zero, points2instances_not_zero
 
     def get_not_zero_mask(self, points2instances):
+        """Selection criterion -- in the instance matrix for a point there is at least one non-zero instance value"""
+
         return np.any(points2instances != 0, axis=1)
