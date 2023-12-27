@@ -12,40 +12,78 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import numpy as np
 import open3d as o3d
 
 from scipy.spatial.distance import cdist
 
 from pcd_dataset.kitti_dataset import KittiDataset
-from services.label_service import get_map_not_zero_in_sphere
+
 from services.normalized_cut_service import normalized_cut
+
+from services.preprocessing.common.config import ConfigDTO
+from services.preprocessing.init.map import InitMapProcessor
+from services.preprocessing.init.instances_matrix import InitInstancesMatrixProcessor
+from services.preprocessing.not_zero import SelectionNotZeroProcessor
+from services.preprocessing.in_cube import SelectionInCubeProcessor
+from services.preprocessing.statistical_outlier import StatisticalOutlierProcessor
+from services.preprocessing.voxel_down import VoxelDownProcessor
+
+from utils.distances_utils import remove_isolated_points
 from utils.distances_utils import sam_label_distance
-from utils.pcd_utils import color_pcd_by_clusters
+from utils.pcd_utils import color_pcd_by_clusters_and_voxels
 
 
 def main():
-    dataset_path = 'dataset_baby/'
+    dataset_path = 'dataset/'
     sequence = '00'
-    image_instances_path = 'pipeline_baby/vfm-labels/sam/00/'
+    image_instances_path = 'pipeline/vfm-labels/sam/00/'
     kitti = KittiDataset(dataset_path, sequence, image_instances_path)
 
-    start_index = 20
-    end_index = 23
-    cam_name = 'cam2'
+    config = ConfigDTO(**{
+    'dataset': kitti,
+    'start_index': 19,
+    'end_index': 23,
+    'start_image_index_offset': 3,
+    'cam_name': 'cam2',
+    'R': 12,
+    'nb_neighbors': 30,
+    'std_ratio': 5.0,
+    'voxel_size': 0.25
+    })
 
-    map, points2instances = get_map_not_zero_in_sphere(kitti, cam_name, start_index, end_index, 8, True)
+    init_pcd = InitMapProcessor().process(config)
+    points2instances = InitInstancesMatrixProcessor().process(config, init_pcd)
 
-    points = np.asarray(map.points)
+    processors = [
+        SelectionNotZeroProcessor(),
+        SelectionInCubeProcessor(),
+        StatisticalOutlierProcessor()
+    ]
+
+    pcd = copy.deepcopy(init_pcd)
+    for processor in processors:
+        pcd, points2instances = processor.process(config, pcd, points2instances)
+
+    pcd_for_clustering = copy.deepcopy(pcd)
+
+    pcd, points2instances, voxel_results = VoxelDownProcessor().process(config, pcd, points2instances)
+    trace = voxel_results[2]
+
+    points = np.asarray(pcd.points)
     spatial_distance = cdist(points, points)
-    dist, masks = sam_label_distance(points2instances, spatial_distance, 2, 10)
 
-    T = 0.3
-    clusters = normalized_cut(dist, np.asarray(points), T)
+    dist, masks = sam_label_distance(points2instances, spatial_distance, 2, 10, 2)
 
-    print("len(clusters) = {}".format(len(clusters)))
+    dist, points, trace = remove_isolated_points(dist, points, trace)
 
-    pcd_clustered = color_pcd_by_clusters(map, clusters)
+    T = 0.2
+    eigenval = 2
+    clusters = normalized_cut(dist, np.array([i for i in range(len(points))], dtype=int), T, eigenval)
+
+    pcd_clustered = color_pcd_by_clusters_and_voxels(pcd_for_clustering, trace, clusters)
+
     o3d.visualization.draw_geometries([pcd_clustered])
 
 
