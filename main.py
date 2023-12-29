@@ -74,7 +74,9 @@ def main():
     points = np.asarray(pcd.points)
     spatial_distance = cdist(points, points)
 
-    dist, masks = sam_label_distance(points2instances, spatial_distance, 2, 10, 2)
+    dist, masks = sam_label_distance(
+        points2instances, spatial_distance, proximity_threshold=2, beta=10, alpha=2
+    )
 
     dist, points, trace = remove_isolated_points(dist, points, trace)
 
