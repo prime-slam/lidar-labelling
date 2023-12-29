@@ -71,6 +71,9 @@ def get_visible_points(pcd_centered, visualize=False):
     diameter = np.linalg.norm(
         np.asarray(pcd_centered.get_max_bound()) - np.asarray(pcd_centered.get_min_bound())
     )
+
+    # In this algorithm, the pcd is considered in the camera coordinate system, 
+    # so the camera position is defined as the origin of coordinates
     camera = [0, 0, 0]
     radius = diameter * 10000
 
