@@ -68,8 +68,7 @@ def main():
 
     pcd_for_clustering = copy.deepcopy(pcd)
 
-    pcd, points2instances, voxel_results = VoxelDownProcessor().process(config, pcd, points2instances)
-    trace = voxel_results[2]
+    pcd, points2instances, trace = VoxelDownProcessor().process(config, pcd, points2instances)
 
     points = np.asarray(pcd.points)
     spatial_distance = cdist(points, points)

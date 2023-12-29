@@ -62,4 +62,4 @@ class VoxelDownProcessor:
 
             upd_points2instances[i] = voxel_instance
 
-        return downpcd, upd_points2instances, downpcd_trace
+        return downpcd, upd_points2instances, downpcd_trace[2]
