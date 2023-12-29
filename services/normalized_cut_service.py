@@ -21,6 +21,17 @@ def cut_cost(W, mask):
 
 
 def ncut_cost(W, D, cut):
+    """Calculating the value of the normalized similarity criterion for current graph cut
+
+    Parameters
+    ----------
+    W : matrix
+        distance matrix, shows the distance between points and the weight of the corresponding connecting edges
+    D : matrix
+        diagonal matrix obtained by transforming the distance matrix
+    cut : array
+        current n-cut, whose cost needs to be calculated
+    """
     cost = cut_cost(W, cut)
     assoc_a = D.todense()[cut].sum()  # Anastasiia: this also can be optimized in the future
     assoc_b = D.todense()[~cut].sum()
@@ -28,6 +39,19 @@ def ncut_cost(W, D, cut):
 
 
 def get_min_ncut(ev, d, w, num_cuts):
+    """Construction of a minimal graph cut based on a normalized similarity criterion
+    
+    Parameters
+    ----------
+    ev : eigenvector
+    d : matrix
+        diagonal matrix obtained by transforming the distance matrix
+    w : matrix
+        distance matrix, shows the distance between points and the weight of the corresponding connecting edges
+    num_cuts : int
+        number of generated graph cuts, among which the minimum will be selected
+    """
+
     mcut = np.inf
     mn = ev.min()
     mx = ev.max()
@@ -52,7 +76,19 @@ def get_min_ncut(ev, d, w, num_cuts):
 
 
 def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
-    """Implementation of the GraphCut algorithm for segmentation labels based on a matrix of distances W between them"""
+    """Implementation of the GraphCut algorithm for segmentation labels based on a matrix of distances W between them
+    
+    Parameters
+    ----------
+    w : matrix
+        distance matrix, shows the distance between points and the weight of the corresponding connecting edges
+    labels : array
+        objects that will be divided into clusters; cloud points
+    T : float
+        criterion for stopping recursive calls to the algorithm
+    eigenvalues_count : int
+        number of eigenvalues that need to be calculated during the algorithm
+    """
 
     W = w + sparse.identity(w.shape[0])
 
