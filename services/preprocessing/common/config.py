@@ -27,7 +27,7 @@ def is_valid_cam_name(instance, attribute, value):
       raise ValueError("{} has to be in [cam0, cam1, cam2, cam3]!".format(attribute.name))
 
 
-def end_more_than_start(instance, attribute, value):
+def end_greater_than_start(instance, attribute, value):
    if value <= instance.start_index:
       raise ValueError("'end_index' has to be more than 'start_index'!")
 
@@ -66,7 +66,7 @@ class ConfigDTO:
    dataset: AbstractDataset = attr.ib()
 
    start_index: int = attr.ib(default=5, validator=[attr.validators.instance_of(int), is_positive])
-   end_index: int = attr.ib(default=10, validator=[attr.validators.instance_of(int), end_more_than_start])
+   end_index: int = attr.ib(default=10, validator=[attr.validators.instance_of(int), end_greater_than_start])
    start_image_index_offset: int = attr.ib(
       default=3, validator=[attr.validators.instance_of(int), is_positive, image_offset_less_than_start_index]
    )
