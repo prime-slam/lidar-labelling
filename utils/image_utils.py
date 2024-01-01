@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Sofya Vivdich and Anastasiia Kornilova
+# Copyright (c) 2023, Sofia Vivdich and Anastasiia Kornilova
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,19 +25,12 @@ from constants import DEVICE
 from constants import MODEL_TYPE
 
 
-def visualize_image(image):
-    plt.imshow(image)
-
-
-def format_colors_to_255(colors):
-    return np.array(colors) / 255
-
-
 def generate_random_colors(N):
-    colors = []
+    colors = [[0, 0, 0]]
     for _ in range(N):
         colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
 
+    colors = np.vstack(colors) / 255
     return colors
 
 
@@ -70,3 +63,6 @@ def get_black_image(src_image):
 
     return black_image
 
+
+def visualize_image(image):
+    plt.imshow(image)

@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Sofya Vivdich and Anastasiia Kornilova
+# Copyright (c) 2023, Sofia Vivdich and Anastasiia Kornilova
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+import zope.interface
 
 
-class AbstractMapping(ABC):
-    def __init__(self, dataset):
-        self._dataset = dataset
-        super().__init__()
+class IProcessor(zope.interface.Interface):
 
-    @property
-    def dataset(self):
-        return self._dataset
-
-    @abstractmethod
-    def points_to_pixels(self, cam_name, points, img_shape):
-        pass
-
-    @abstractmethod
-    def get_combined_labeled_point_clouds(self, cam_name, start_index, end_index):
-        pass
+    def process(config, pcd=None, points2instances=None):
+        """processing pcd and points2instances matrix with parameters from the config"""

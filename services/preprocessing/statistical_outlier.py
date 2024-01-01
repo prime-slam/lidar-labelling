@@ -12,4 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SUCCESSFUL_IMAGE_PROCESSING = "Image {} processed"
+import zope.interface
+
+from services.preprocessing.common.interface import IProcessor
+from utils.pcd_utils import remove_statistical_outlier_points
+
+
+@zope.interface.implementer(IProcessor)
+class StatisticalOutlierProcessor:
+
+    def process(self, config, pcd, points2instances):
+        """Removing statistical outlier points taking into account neighbors and threshold value from the config"""
+
+        pcd, ind = remove_statistical_outlier_points(pcd, config.nb_neighbors, config.std_ratio)
+
+        return pcd, points2instances[ind]

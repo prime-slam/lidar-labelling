@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Sofya Vivdich and Anastasiia Kornilova
+# Copyright (c) 2023, Sofia Vivdich and Anastasiia Kornilova
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ from pcd_dataset.abstract_pcd_dataset import AbstractDataset
 
 
 class KittiDataset(AbstractDataset):
+    """Working with clouds and images from the KITTI dataset, see here: https://www.cvlibs.net/datasets/kitti/eval_odometry.php"""
+
     def __init__(self, dataset_path, sequence, image_instances_path):
         super().__init__(pykitti.odometry(dataset_path, sequence))
         self.image_instances_path = image_instances_path
@@ -31,8 +33,14 @@ class KittiDataset(AbstractDataset):
         points = self.dataset.get_velo(index)[:, :3]
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
-
         return pcd
+
+    def get_lidar_pose(self, index):
+        return (
+                np.linalg.inv(self.get_camera_extrinsics('cam0'))
+                @ self.dataset.poses[index]
+                @ self.get_camera_extrinsics('cam0')
+        )
 
     def get_camera_names(self):
         return ['cam0', 'cam1', 'cam2', 'cam3']
