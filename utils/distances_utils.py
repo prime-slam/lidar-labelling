@@ -17,7 +17,7 @@ import numpy as np
 
 
 def sam_label_distance(
-        sam_features, spatial_distance, proximity_threshold, beta, alpha
+    sam_features, spatial_distance, proximity_threshold, beta, alpha
 ):
     """Calculating a matrix of distances between points based on preliminary labeling and physical distance between points.
 
@@ -42,7 +42,7 @@ def sam_label_distance(
     distance_matrix = np.zeros((num_points, num_points))
 
     # Iterate over rows (points)
-    for point1, point2 in (zip(*mask)):
+    for point1, point2 in zip(*mask):
         view_counter = 0
         for view in range(num_views):
             instance_id1 = sam_features[point1, view]
@@ -77,7 +77,7 @@ def remove_isolated_points(dist, points, trace):
         del trace_copy[index]
 
     mask_not_isolated = np.any(dist - np.eye(dist.shape[0]) != 0, axis=1)
-    
+
     return (
         dist[mask_not_isolated][:, mask_not_isolated],
         points[mask_not_isolated],

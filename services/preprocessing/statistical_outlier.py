@@ -20,7 +20,6 @@ from utils.pcd_utils import remove_statistical_outlier_points
 
 @zope.interface.implementer(IProcessor)
 class StatisticalOutlierProcessor:
-
     def process(self, config, pcd, points2instances):
         """Removing statistical outlier points taking into account neighbors and threshold value from the config"""
 

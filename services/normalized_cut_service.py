@@ -102,7 +102,7 @@ def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
         A = D2 * (D - W) * D2
 
         eigvals, eigvecs = sparse.linalg.eigsh(
-            A, eigenvalues_count, sigma=0, which='LM'
+            A, eigenvalues_count, sigma=0, which="LM"
         )
 
         index2 = np.argsort(eigvals)[1]

@@ -22,7 +22,6 @@ from utils.pcd_utils import get_subpcd
 
 @zope.interface.implementer(IProcessor)
 class SelectionInCubeProcessor:
-
     def process(self, config, pcd, points2instances):
         """Selection of points inside a cube with a given side.
         The cube starts from the lidar location at the moment of recording the config.start_index cloud.
@@ -40,7 +39,6 @@ class SelectionInCubeProcessor:
         points2instances_in_cube = points2instances[close_point_indices]
 
         return pcd_in_cube, points2instances_in_cube
-
 
     def get_close_point_indices_cube(self, pcd, center, R):
         """Sampling pcd indices inside a cube

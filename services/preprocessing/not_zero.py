@@ -21,7 +21,6 @@ from utils.pcd_utils import get_subpcd
 
 @zope.interface.implementer(IProcessor)
 class SelectionNotZeroProcessor:
-
     def process(self, config, pcd, points2instances):
         """Selection of pcd points that were labeled on at least one image"""
 

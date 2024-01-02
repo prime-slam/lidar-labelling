@@ -51,7 +51,7 @@ def main():
             "R": 12,
             "nb_neighbors": 30,
             "std_ratio": 5.0,
-            "voxel_size": 0.25
+            "voxel_size": 0.25,
         }
     )
 

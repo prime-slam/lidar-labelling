@@ -22,7 +22,6 @@ from services.preprocessing.common.interface import IProcessor
 
 @zope.interface.implementer(IProcessor)
 class VoxelDownProcessor:
-
     def process(self, config, pcd, points2instances):
         """Downsample input pcd with a voxel"""
 
@@ -35,9 +34,8 @@ class VoxelDownProcessor:
             config.voxel_size,
         )
 
-
     def build_o3d_voxel_pcd(
-            self, pcd, points2instances, start_index, end_index, image_offset, voxel_size
+        self, pcd, points2instances, start_index, end_index, image_offset, voxel_size
     ):
         """Open3d function voxel_down_sample_and_trace call.
 

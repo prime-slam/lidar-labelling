@@ -23,7 +23,6 @@ from utils.pcd_utils import get_visible_points
 
 @zope.interface.implementer(IProcessor)
 class InitInstancesMatrixProcessor:
-
     def process(self, config, pcd, points2instances=None):
         """Constructing an instance matrix for pcd.
 
@@ -32,22 +31,22 @@ class InitInstancesMatrixProcessor:
         """
 
         points2instances = self.build_points2instances_matrix(
-            pcd, 
-            config.dataset, 
-            config.cam_name, 
-            config.start_index - config.start_image_index_offset, 
-            config.end_index
+            pcd,
+            config.dataset,
+            config.cam_name,
+            config.start_index - config.start_image_index_offset,
+            config.end_index,
         )
 
         return points2instances
 
     def build_points2instances_matrix(
-            self, map_wc, dataset, cam_name, start_image_index, end_image_index
+        self, map_wc, dataset, cam_name, start_image_index, end_image_index
     ):
         """The map is moved to the camera coordinate system at the moment the current image is taken.
         The function for removing hidden points is called (get_visible_points).
 
-        Cloud points are related to pixels. The instance number of the corresponding pixel is written into 
+        Cloud points are related to pixels. The instance number of the corresponding pixel is written into
         the points2instances matrix for the point and the current image.
 
         The action is repeated for all images.
@@ -65,10 +64,10 @@ class InitInstancesMatrixProcessor:
 
             map_cc = copy.deepcopy(map_wc).transform(
                 np.linalg.inv(T_cam)
-            ) # map in camera frame
+            )  # map in camera frame
             indices_visible = get_visible_points(map_cc)
             map_cc_visible = get_subpcd(map_cc, indices_visible)
-            
+
             points_to_pixels = self.get_points_to_pixels(
                 np.asarray(map_cc_visible.points),
                 dataset.get_camera_intrinsics(cam_name),
@@ -92,10 +91,10 @@ class InitInstancesMatrixProcessor:
         points_coord = points_proj.T
 
         inds = np.where(
-            (points_coord[:, 0] < img_width) 
-            & (points_coord[:, 0] >= 0) 
-            & (points_coord[:, 1] < img_height) 
-            & (points_coord[:, 1] >= 0) 
+            (points_coord[:, 0] < img_width)
+            & (points_coord[:, 0] >= 0)
+            & (points_coord[:, 1] < img_height)
+            & (points_coord[:, 1] >= 0)
             & (points_coord[:, 2] > 0)
         )[0]
 

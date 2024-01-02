@@ -16,6 +16,5 @@ import zope.interface
 
 
 class IProcessor(zope.interface.Interface):
-
     def process(config, pcd=None, points2instances=None):
         """processing pcd and points2instances matrix with parameters from the config"""

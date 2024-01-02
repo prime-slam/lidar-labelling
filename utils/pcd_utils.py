@@ -36,7 +36,7 @@ def remove_statistical_outlier_points(pcd, nb_neighbors=25, std_ratio=5.0):
 
 
 def build_map_wc_triangle_mesh(
-        dataset, cam_name, start_index, end_index, visualize=False
+    dataset, cam_name, start_index, end_index, visualize=False
 ):
     map_wc = o3d.geometry.PointCloud()
 

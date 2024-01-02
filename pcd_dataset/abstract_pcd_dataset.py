@@ -27,7 +27,7 @@ class AbstractDataset(ABC):
     @abstractmethod
     def get_point_cloud(self, index):
         pass
-    
+
     @abstractmethod
     def get_lidar_pose(self, index):
         pass
