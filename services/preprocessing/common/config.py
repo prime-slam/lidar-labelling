@@ -39,43 +39,62 @@ def image_offset_less_than_start_index(instance, attribute, value):
 
 @attr.s
 class ConfigDTO:
-   """Config is used to set cloud preprocessing parameters before segmentation
+    """Config is used to set cloud preprocessing parameters before segmentation
 
-   Attributes
-   ----------
-   dataset : AbstractDataset
-      an instance of a dataset of clouds and images (e.g. KITTI)
-   start_index : int
-      number of the first cloud in the processed sequence
-   end_index : int
-      number of the last cloud in the processed sequence
-   start_image_index_offset : int
-      offset of the first number of images of the covering sequence relative to the start cloud
-   cam_name : str
-      name of the camera whose images will be used
-   R : int
-      side of a cube within which points are considered
-   nb_neighbors : int
-      number of neighbors taken into account in the statistical outlier removal function
-   std_ratio : float
-      the threshold level in the statistical outlier removal function
-   voxel_size : float
-      voxel size to downsample into
-   """
+    Attributes
+    ----------
+    dataset : AbstractDataset
+       an instance of a dataset of clouds and images (e.g. KITTI)
+    start_index : int
+       number of the first cloud in the processed sequence
+    end_index : int
+       number of the last cloud in the processed sequence
+    start_image_index_offset : int
+       offset of the first number of images of the covering sequence relative to the start cloud
+    cam_name : str
+       name of the camera whose images will be used
+    R : int
+       side of a cube within which points are considered
+    nb_neighbors : int
+       number of neighbors taken into account in the statistical outlier removal function
+    std_ratio : float
+       the threshold level in the statistical outlier removal function
+    voxel_size : float
+       voxel size to downsample into
+    """
 
-   dataset: AbstractDataset = attr.ib()
+    dataset: AbstractDataset = attr.ib()
 
-   start_index: int = attr.ib(default=5, validator=[attr.validators.instance_of(int), is_positive])
-   end_index: int = attr.ib(default=10, validator=[attr.validators.instance_of(int), end_greater_than_start])
-   start_image_index_offset: int = attr.ib(
-      default=3, validator=[attr.validators.instance_of(int), is_positive, image_offset_less_than_start_index]
-   )
-   
-   cam_name: str = attr.ib(default='cam2', validator=[attr.validators.instance_of(str), is_valid_cam_name])
+    start_index: int = attr.ib(
+       default=5, validator=[attr.validators.instance_of(int), is_positive]
+    )
+    end_index: int = attr.ib(
+       default=10, validator=[attr.validators.instance_of(int), end_greater_than_start]
+    )
+    start_image_index_offset: int = attr.ib(
+       default=3, 
+       validator=[
+          attr.validators.instance_of(int), 
+          is_positive, 
+          image_offset_less_than_start_index
+       ],
+    )
+      
+    cam_name: str = attr.ib(
+       default='cam2', validator=[attr.validators.instance_of(str), is_valid_cam_name]
+    )
 
-   R: int = attr.ib(default=12, validator=[attr.validators.instance_of(int), is_positive])
+    R: int = attr.ib(
+       default=12, validator=[attr.validators.instance_of(int), is_positive]
+    )
 
-   nb_neighbors: int = attr.ib(default=25, validator=[attr.validators.instance_of(int), is_positive])
-   std_ratio: float = attr.ib(default=5.0, validator=[attr.validators.instance_of(float), is_positive])
+    nb_neighbors: int = attr.ib(
+       default=25, validator=[attr.validators.instance_of(int), is_positive]
+    )
+    std_ratio: float = attr.ib(
+       default=5.0, validator=[attr.validators.instance_of(float), is_positive]
+    )
 
-   voxel_size: float = attr.ib(default=0.3, validator=[attr.validators.instance_of(float), is_positive])
+    voxel_size: float = attr.ib(
+       default=0.3, validator=[attr.validators.instance_of(float), is_positive]
+    )

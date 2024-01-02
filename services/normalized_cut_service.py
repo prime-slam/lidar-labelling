@@ -33,14 +33,15 @@ def ncut_cost(W, D, cut):
         current n-cut, whose cost needs to be calculated
     """
     cost = cut_cost(W, cut)
-    assoc_a = D.todense()[cut].sum()  # Anastasiia: this also can be optimized in the future
+    # Anastasiia: this also can be optimized in the future
+    assoc_a = D.todense()[cut].sum()
     assoc_b = D.todense()[~cut].sum()
     return (cost / assoc_a) + (cost / assoc_b)
 
 
 def get_min_ncut(ev, d, w, num_cuts):
     """Construction of a minimal graph cut based on a normalized similarity criterion
-    
+
     Parameters
     ----------
     ev : eigenvector
@@ -77,7 +78,7 @@ def get_min_ncut(ev, d, w, num_cuts):
 
 def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
     """Implementation of the GraphCut algorithm for segmentation labels based on a matrix of distances W between them
-    
+
     Parameters
     ----------
     w : matrix
@@ -100,18 +101,24 @@ def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
 
         A = D2 * (D - W) * D2
 
-        eigvals, eigvecs = sparse.linalg.eigsh(A, eigenvalues_count, sigma=0, which='LM')
+        eigvals, eigvecs = sparse.linalg.eigsh(
+            A, eigenvalues_count, sigma=0, which='LM'
+        )
 
         index2 = np.argsort(eigvals)[1]
 
         ev = eigvecs[:, index2]
-        
+
         mask, mcut = get_min_ncut(ev, D, w, 10)
         print("mcut = {}".format(mcut))
 
         if mcut < T:
-            labels1 = normalized_cut(w[mask][:, mask], labels[mask], T, eigenvalues_count)
-            labels2 = normalized_cut(w[~mask][:, ~mask], labels[~mask], T, eigenvalues_count)
+            labels1 = normalized_cut(
+                w[mask][:, mask], labels[mask], T, eigenvalues_count
+            )
+            labels2 = normalized_cut(
+                w[~mask][:, ~mask], labels[~mask], T, eigenvalues_count
+            )
             return labels1 + labels2
         else:
             return [labels]

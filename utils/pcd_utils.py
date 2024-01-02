@@ -35,7 +35,9 @@ def remove_statistical_outlier_points(pcd, nb_neighbors=25, std_ratio=5.0):
     return pcd_result, indices
 
 
-def build_map_wc_triangle_mesh(dataset, cam_name, start_index, end_index, visualize=False):
+def build_map_wc_triangle_mesh(
+        dataset, cam_name, start_index, end_index, visualize=False
+):
     map_wc = o3d.geometry.PointCloud()
 
     geometries = []
@@ -50,7 +52,7 @@ def build_map_wc_triangle_mesh(dataset, cam_name, start_index, end_index, visual
         geometries.append(m.transform(T_cam))
 
     if visualize:
-        # Visualize the map and the location of the camera relative to it 
+        # Visualize the map and the location of the camera relative to it
         o3d.visualization.draw_geometries([map_wc] + geometries)
 
     return map_wc, geometries
@@ -69,10 +71,11 @@ def get_visible_points(pcd_centered, visualize=False):
     """
 
     diameter = np.linalg.norm(
-        np.asarray(pcd_centered.get_max_bound()) - np.asarray(pcd_centered.get_min_bound())
+        np.asarray(pcd_centered.get_max_bound())
+        - np.asarray(pcd_centered.get_min_bound())
     )
 
-    # In this algorithm, the pcd is considered in the camera coordinate system, 
+    # In this algorithm, the pcd is considered in the camera coordinate system,
     # so the camera position is defined as the origin of coordinates
     camera = [0, 0, 0]
     radius = diameter * 10000
@@ -100,7 +103,9 @@ def color_pcd_by_labels(pcd, labels):
 
     colors = generate_random_colors(len(labels) + 1)
     pcd_colored = copy.deepcopy(pcd)
-    pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
+    pcd_colored.colors = o3d.utility.Vector3dVector(
+        np.zeros(np.asarray(pcd.points).shape)
+    )
 
     for i in range(len(pcd_colored.points)):
         pcd_colored.colors[i] = colors[labels[i]]
@@ -123,7 +128,9 @@ def color_pcd_by_clusters_and_voxels(pcd, trace, clusters):
 
     random_colors = generate_random_colors(len(clusters) + 1)
     pcd_colored = copy.deepcopy(pcd)
-    pcd_colored.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
+    pcd_colored.colors = o3d.utility.Vector3dVector(
+        np.zeros(np.asarray(pcd.points).shape)
+    )
 
     for i in range(len(clusters)):
         cluster = clusters[i]

@@ -32,12 +32,18 @@ class InitInstancesMatrixProcessor:
         """
 
         points2instances = self.build_points2instances_matrix(
-            pcd, config.dataset, config.cam_name, config.start_index - config.start_image_index_offset, config.end_index
+            pcd, 
+            config.dataset, 
+            config.cam_name, 
+            config.start_index - config.start_image_index_offset, 
+            config.end_index
         )
 
         return points2instances
 
-    def build_points2instances_matrix(self, map_wc, dataset, cam_name, start_image_index, end_image_index):
+    def build_points2instances_matrix(
+            self, map_wc, dataset, cam_name, start_image_index, end_image_index
+    ):
         """The map is moved to the camera coordinate system at the moment the current image is taken.
         The function for removing hidden points is called (get_visible_points).
 
@@ -53,20 +59,26 @@ class InitInstancesMatrixProcessor:
         for view_id, view in enumerate(range(start_image_index, end_image_index)):
             masks = dataset.get_image_instances(cam_name, view)
             image_labels = self.masks_to_image(masks)
-            
+
             T = dataset.get_lidar_pose(view)
             T_cam = T @ np.linalg.inv(dataset.get_camera_extrinsics(cam_name))
 
-            map_cc = copy.deepcopy(map_wc).transform(np.linalg.inv(T_cam)) # map in camera frame
+            map_cc = copy.deepcopy(map_wc).transform(
+                np.linalg.inv(T_cam)
+            ) # map in camera frame
             indices_visible = get_visible_points(map_cc)
             map_cc_visible = get_subpcd(map_cc, indices_visible)
             
-            points_to_pixels = self.get_points_to_pixels(np.asarray(map_cc_visible.points),
-                                                        dataset.get_camera_intrinsics(cam_name), 
-                                                        ((image_labels.shape[1], image_labels.shape[0])))
+            points_to_pixels = self.get_points_to_pixels(
+                np.asarray(map_cc_visible.points),
+                dataset.get_camera_intrinsics(cam_name),
+                ((image_labels.shape[1], image_labels.shape[0])),
+            )
 
             for point_id, pixel_id in points_to_pixels.items():
-                points2instances[indices_visible[point_id], view_id] = int(image_labels[pixel_id[1], pixel_id[0]])
+                points2instances[indices_visible[point_id], view_id] = int(
+                    image_labels[pixel_id[1], pixel_id[0]]
+                )
 
         return points2instances
 
@@ -80,9 +92,11 @@ class InitInstancesMatrixProcessor:
         points_coord = points_proj.T
 
         inds = np.where(
-            (points_coord[:, 0] < img_width) & (points_coord[:, 0] >= 0) &
-            (points_coord[:, 1] < img_height) & (points_coord[:, 1] >= 0) &
-            (points_coord[:, 2] > 0)
+            (points_coord[:, 0] < img_width) 
+            & (points_coord[:, 0] >= 0) 
+            & (points_coord[:, 1] < img_height) 
+            & (points_coord[:, 1] >= 0) 
+            & (points_coord[:, 2] > 0)
         )[0]
 
         points_ind_to_pixels = {}
@@ -94,7 +108,7 @@ class InitInstancesMatrixProcessor:
     def masks_to_image(self, masks):
         """Assigning instance numbers for each mask of a segmented image"""
 
-        image_labels = np.zeros(masks[0]['segmentation'].shape)
+        image_labels = np.zeros(masks[0]["segmentation"].shape)
         for i, mask in enumerate(masks):
-            image_labels[mask['segmentation']] = i + 1
+            image_labels[mask["segmentation"]] = i + 1
         return image_labels

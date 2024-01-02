@@ -26,7 +26,7 @@ class SelectionNotZeroProcessor:
         """Selection of pcd points that were labeled on at least one image"""
 
         not_zero_indices = self.get_not_zero_mask(points2instances)
-        
+
         pcd_not_zero = get_subpcd(pcd, not_zero_indices)
         points2instances_not_zero = points2instances[not_zero_indices]
 

@@ -28,12 +28,13 @@ class SelectionInCubeProcessor:
         The cube starts from the lidar location at the moment of recording the config.start_index cloud.
         """
 
-        T_first_cam = (
-            config.dataset.get_lidar_pose(config.start_index) 
-            @ np.linalg.inv(config.dataset.get_camera_extrinsics(config.cam_name))
+        T_first_cam = config.dataset.get_lidar_pose(config.start_index) @ np.linalg.inv(
+            config.dataset.get_camera_extrinsics(config.cam_name)
         )
 
-        close_point_indices = self.get_close_point_indices_cube(pcd, T_first_cam, config.R)
+        close_point_indices = self.get_close_point_indices_cube(
+            pcd, T_first_cam, config.R
+        )
 
         pcd_in_cube = get_subpcd(pcd, close_point_indices)
         points2instances_in_cube = points2instances[close_point_indices]

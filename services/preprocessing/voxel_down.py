@@ -27,11 +27,18 @@ class VoxelDownProcessor:
         """Downsample input pcd with a voxel"""
 
         return self.build_o3d_voxel_pcd(
-            pcd, points2instances, config.start_index, config.end_index, config.start_image_index_offset, config.voxel_size
+            pcd,
+            points2instances,
+            config.start_index,
+            config.end_index,
+            config.start_image_index_offset,
+            config.voxel_size,
         )
 
 
-    def build_o3d_voxel_pcd(self, pcd, points2instances, start_index, end_index, image_offset, voxel_size):
+    def build_o3d_voxel_pcd(
+            self, pcd, points2instances, start_index, end_index, image_offset, voxel_size
+    ):
         """Open3d function voxel_down_sample_and_trace call.
 
         Recalculation of the instance matrix for the voxel cloud. The voxel is assigned an instance
@@ -43,7 +50,9 @@ class VoxelDownProcessor:
         min_bound = pcd_copy.get_min_bound()
         max_bound = pcd_copy.get_max_bound()
 
-        downpcd_trace = pcd_copy.voxel_down_sample_and_trace(voxel_size, min_bound, max_bound, True)
+        downpcd_trace = pcd_copy.voxel_down_sample_and_trace(
+            voxel_size, min_bound, max_bound, True
+        )
 
         downpcd = downpcd_trace[0]
         list_int_vectors = downpcd_trace[2]
@@ -57,7 +66,7 @@ class VoxelDownProcessor:
             for j in range(len(int_vector_array)):
                 instances.append(points2instances[int_vector_array[j]])
             instances_array = np.asarray(instances)
-            
+
             voxel_instance = npi.mode(instances_array)
 
             upd_points2instances[i] = voxel_instance

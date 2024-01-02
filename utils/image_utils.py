@@ -28,7 +28,9 @@ from constants import MODEL_TYPE
 def generate_random_colors(N):
     colors = [[0, 0, 0]]
     for _ in range(N):
-        colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
+        colors.append(
+            [random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)]
+        )
 
     colors = np.vstack(colors) / 255
     return colors
@@ -41,7 +43,9 @@ def get_annotated_image(cam_image):
 
     black_image = get_black_image(cam_image)
 
-    annotated_image = mask_annotator.annotate(scene=np.array(black_image), detections=detections, opacity=1.0)
+    annotated_image = mask_annotator.annotate(
+        scene=np.array(black_image), detections=detections, opacity=1.0
+    )
 
     return im.fromarray(annotated_image)
 

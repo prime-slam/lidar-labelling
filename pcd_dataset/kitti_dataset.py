@@ -37,50 +37,52 @@ class KittiDataset(AbstractDataset):
 
     def get_lidar_pose(self, index):
         return (
-                np.linalg.inv(self.get_camera_extrinsics('cam0'))
-                @ self.dataset.poses[index]
-                @ self.get_camera_extrinsics('cam0')
+            np.linalg.inv(self.get_camera_extrinsics("cam0"))
+            @ self.dataset.poses[index]
+            @ self.get_camera_extrinsics("cam0")
         )
 
     def get_camera_names(self):
-        return ['cam0', 'cam1', 'cam2', 'cam3']
+        return ["cam0", "cam1", "cam2", "cam3"]
 
     def get_camera_image(self, cam_name, index):
         image, color = None, None
-        if cam_name == 'cam0':
+        if cam_name == "cam0":
             image, color = self.dataset.get_cam0(index), cv2.COLOR_GRAY2BGR
-        elif cam_name == 'cam1':
+        elif cam_name == "cam1":
             image, color = self.dataset.get_cam1(index), cv2.COLOR_GRAY2BGR
-        elif cam_name == 'cam2':
+        elif cam_name == "cam2":
             image, color = self.dataset.get_cam2(index), cv2.COLOR_RGB2BGR
-        elif cam_name == 'cam3':
+        elif cam_name == "cam3":
             image, color = self.dataset.get_cam3(index), cv2.COLOR_RGB2BGR
         return cv2.cvtColor(np.array(image), color)
 
     def get_image_instances(self, cam_name, index):
-        masks_path = Path.cwd().joinpath(self.image_instances_path, cam_name, '{}.npz'.format(str(index).zfill(6)))
-        return np.load(masks_path, allow_pickle=True)['masks']
+        masks_path = Path.cwd().joinpath(
+            self.image_instances_path, cam_name, "{}.npz".format(str(index).zfill(6))
+        )
+        return np.load(masks_path, allow_pickle=True)["masks"]
 
     def get_camera_intrinsics(self, cam_name):
-        if cam_name == 'cam0':
+        if cam_name == "cam0":
             return self.dataset.calib.K_cam0
-        elif cam_name == 'cam1':
+        elif cam_name == "cam1":
             return self.dataset.calib.K_cam1
-        elif cam_name == 'cam2':
+        elif cam_name == "cam2":
             return self.dataset.calib.K_cam2
-        elif cam_name == 'cam3':
+        elif cam_name == "cam3":
             return self.dataset.calib.K_cam3
         else:
             return None
 
     def get_camera_extrinsics(self, cam_name):
-        if cam_name == 'cam0':
+        if cam_name == "cam0":
             return self.dataset.calib.T_cam0_velo
-        elif cam_name == 'cam1':
+        elif cam_name == "cam1":
             return self.dataset.calib.T_cam1_velo
-        elif cam_name == 'cam2':
+        elif cam_name == "cam2":
             return self.dataset.calib.T_cam2_velo
-        elif cam_name == 'cam3':
+        elif cam_name == "cam3":
             return self.dataset.calib.T_cam3_velo
         else:
             return None

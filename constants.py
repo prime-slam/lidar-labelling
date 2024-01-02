@@ -16,7 +16,7 @@ import torch
 
 from pathlib import Path
 
-CHECKPOINT_PATH = Path.cwd().joinpath('weights', 'sam_vit_h_4b8939.pth')
+CHECKPOINT_PATH = Path.cwd().joinpath("weights", "sam_vit_h_4b8939.pth")
 
-DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 MODEL_TYPE = "vit_h"
