@@ -12,4 +12,4 @@ matplotlib==3.7.2
 supervision==0.14.0
 segment_anything==1.0
 jupyter==1.0.0
-jupyter_black==0.3.4
+"black[jupyter]"==0.3.4

@@ -23,7 +23,7 @@ def is_positive(instance, attribute, value):
 
 
 def is_valid_cam_name(instance, attribute, value):
-    if value != 'cam0' and value != 'cam1' and value != 'cam2' and value != 'cam3':
+    if value != "cam0" and value != "cam1" and value != "cam2" and value != "cam3":
         raise ValueError(
             "{} has to be in [cam0, cam1, cam2, cam3]!".format(attribute.name)
         )
@@ -76,14 +76,14 @@ class ConfigDTO:
         default=10, validator=[attr.validators.instance_of(int), end_greater_than_start]
     )
     start_image_index_offset: int = attr.ib(
-        default=3, 
+        default=3,
         validator=[
-            attr.validators.instance_of(int), 
-            is_positive, 
+            attr.validators.instance_of(int),
+            is_positive,
             image_offset_less_than_start_index,
         ],
     )
-      
+
     cam_name: str = attr.ib(
         default="cam2", validator=[attr.validators.instance_of(str), is_valid_cam_name]
     )
