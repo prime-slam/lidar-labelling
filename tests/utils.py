@@ -17,7 +17,8 @@ import open3d as o3d
 
 from services.preprocessing.common.config import ConfigDTO
 
-def generate_init_pcd(config : ConfigDTO):
+
+def generate_init_pcd(config: ConfigDTO):
     map_wc = o3d.geometry.PointCloud()
 
     for i in range(config.start_index, config.end_index):
