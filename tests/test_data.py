@@ -12,10 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
+from pcd_dataset.kitti_dataset import KittiDataset
+from services.preprocessing.common.config import ConfigDTO
 
-from pathlib import Path
+dataset_path = "tests/test_dataset/"
+sequence = "00"
+image_instances_path = "tests/test_pipeline/vfm-labels/sam/00/"
 
-path_to_dataset = Path("tests/test_dataset")
+kitti = KittiDataset(dataset_path, sequence, image_instances_path)
 
-intrinsics = np.loadtxt(path_to_dataset / "intrinsics.txt")
+config = ConfigDTO(
+    **{
+        "dataset": kitti,
+        "start_index": 3,
+        "end_index": 7,
+        "start_image_index_offset": 2,
+        "cam_name": "cam2",
+        "R": 12,
+        "nb_neighbors": 30,
+        "std_ratio": 5.0,
+        "voxel_size": 0.25,
+    }
+)
+
+real_init_map_size = sum(
+    len(kitti.get_point_cloud(i).points) for i in range(config.start_index, config.end_index)
+)
+
+real_image_count = config.end_index - (config.start_index - config.start_image_index_offset)
