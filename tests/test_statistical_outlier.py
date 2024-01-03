@@ -16,7 +16,7 @@ import numpy as np
 import open3d as o3d
 import pytest
 
-from services.preprocessing.in_cube import SelectionInCubeProcessor
+from services.preprocessing.statistical_outlier import StatisticalOutlierProcessor
 
 from tests.test_data import config
 
@@ -30,12 +30,12 @@ from tests.test_data import config
         (
             np.array(
                 [
-                    [0.1, 0.1, 5555],
-                    [0.2, 0.2, 6666],
-                    [0.3, 0.3, 7777],
+                    [0.1, 0.1, 2],
+                    [0.2, 0.2, 3],
+                    [0.3, 0.3, 4],
                     [0.4, 0.4, 2],
-                    [0.5, 0.5, 8888],
-                    [0.6, 0.6, 9999],
+                    [0.5, 0.5, 6],
+                    [-100000, -300000, -999999],
                     [0.7, 0.7, 5],
                     [0.8, 0.8, 3],
                     [0.9, 0.9, 1],
@@ -56,7 +56,11 @@ from tests.test_data import config
             ),
             np.array(
                 [
+                    [0.1, 0.1, 2],
+                    [0.2, 0.2, 3],
+                    [0.3, 0.3, 4],
                     [0.4, 0.4, 2],
+                    [0.5, 0.5, 6],
                     [0.7, 0.7, 5],
                     [0.8, 0.8, 3],
                     [0.9, 0.9, 1],
@@ -64,7 +68,11 @@ from tests.test_data import config
             ),
             np.array(
                 [
+                    [1, 2, 3, 4, 5, 6],
+                    [0, 2, 3, 4, 5, 6],
+                    [1, 0, 3, 4, 5, 6],
                     [1, 2, 0, 4, 5, 6],
+                    [1, 2, 3, 0, 5, 6],
                     [1, 2, 3, 4, 5, 0],
                     [0, 0, 3, 4, 5, 6],
                     [1, 0, 0, 4, 5, 6],
@@ -79,7 +87,7 @@ def test_select_points_in_cube(
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(src_points)
 
-    actual_pcd, actual_points2instances = SelectionInCubeProcessor().process(
+    actual_pcd, actual_points2instances = StatisticalOutlierProcessor().process(
         config, pcd, src_points2instances
     )
 

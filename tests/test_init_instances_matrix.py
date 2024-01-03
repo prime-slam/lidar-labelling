@@ -25,8 +25,8 @@ from tests.utils import generate_init_pcd
 def test_init_map(init_pcd: o3d.geometry.PointCloud):
     points2instances = InitInstancesMatrixProcessor().process(config, init_pcd)
 
-    real_image_count = config.end_index - (
+    expected_image_count = config.end_index - (
         config.start_index - config.start_image_index_offset
     )
 
-    assert points2instances.shape == (len(init_pcd.points), real_image_count)
+    assert points2instances.shape == (len(init_pcd.points), expected_image_count)

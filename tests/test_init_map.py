@@ -20,9 +20,9 @@ from tests.test_data import config
 def test_init_map():
     init_pcd = InitMapProcessor().process(config)
 
-    real_init_map_size = sum(
+    expected_init_map_size = sum(
         len(config.dataset.get_point_cloud(i).points)
         for i in range(config.start_index, config.end_index)
     )
 
-    assert len(init_pcd.points) == real_init_map_size
+    assert len(init_pcd.points) == expected_init_map_size

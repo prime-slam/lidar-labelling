@@ -29,8 +29,8 @@ config = ConfigDTO(
         "start_image_index_offset": 2,
         "cam_name": "cam2",
         "R": 12,
-        "nb_neighbors": 30,
-        "std_ratio": 5.0,
+        "nb_neighbors": 5,
+        "std_ratio": 2.0,
         "voxel_size": 0.25,
     }
 )
