@@ -16,7 +16,7 @@ import numpy as np
 import open3d as o3d
 import pytest
 
-from services.preprocessing.statistical_outlier import StatisticalOutlierProcessor
+from services.preprocessing.not_zero import SelectionNotZeroProcessor
 
 from tests.test_data import config
 
@@ -30,64 +30,54 @@ from tests.test_data import config
         (
             np.array(
                 [
-                    [0.1, 0.1, 2],
-                    [0.2, 0.2, 3],
-                    [0.3, 0.3, 4],
-                    [0.4, 0.4, 2],
-                    [0.5, 0.5, 6],
-                    [-100000, -300000, -999999],
-                    [0.7, 0.7, 5],
-                    [0.8, 0.8, 3],
-                    [0.9, 0.9, 1],
+                    [0.1, 0.1, 0.1],
+                    [0.2, 0.2, 0.2],
+                    [0.3, 0.3, 0.3],
+                    [0.4, 0.4, 0.4],
+                    [0.5, 0.5, 0.5],
+                    [0.6, 0.6, 0.6],
+                    [0.7, 0.7, 0.7],
+                    [0.8, 0.8, 0.8],
+                    [0.9, 0.9, 0.8],
                 ]
             ),
             np.array(
                 [
-                    [1, 2, 3, 4, 5, 6],
-                    [0, 2, 3, 4, 5, 6],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
                     [1, 0, 3, 4, 5, 6],
-                    [1, 2, 0, 4, 5, 6],
-                    [1, 2, 3, 0, 5, 6],
-                    [1, 2, 3, 4, 0, 6],
-                    [1, 2, 3, 4, 5, 0],
-                    [0, 0, 3, 4, 5, 6],
-                    [1, 0, 0, 4, 5, 6],
+                    [0, 0, 0, 0, 0, 0],
+                    [1, 2, 3, 0, 0, 0],
+                    [0, 0, 3, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
                 ]
             ),
             np.array(
                 [
-                    [0.1, 0.1, 2],
-                    [0.2, 0.2, 3],
-                    [0.3, 0.3, 4],
-                    [0.4, 0.4, 2],
-                    [0.5, 0.5, 6],
-                    [0.7, 0.7, 5],
-                    [0.8, 0.8, 3],
-                    [0.9, 0.9, 1],
+                    [0.3, 0.3, 0.3],
+                    [0.5, 0.5, 0.5],
+                    [0.6, 0.6, 0.6],
                 ]
             ),
             np.array(
                 [
-                    [1, 2, 3, 4, 5, 6],
-                    [0, 2, 3, 4, 5, 6],
                     [1, 0, 3, 4, 5, 6],
-                    [1, 2, 0, 4, 5, 6],
-                    [1, 2, 3, 0, 5, 6],
-                    [1, 2, 3, 4, 5, 0],
-                    [0, 0, 3, 4, 5, 6],
-                    [1, 0, 0, 4, 5, 6],
+                    [1, 2, 3, 0, 0, 0],
+                    [0, 0, 3, 0, 0, 0],
                 ]
             ),
         )
     ],
 )
-def test_remove_statistical_outlier(
+def test_select_not_zero(
     src_points, src_points2instances, expected_points, expected_points2instances
 ):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(src_points)
 
-    actual_pcd, actual_points2instances = StatisticalOutlierProcessor().process(
+    actual_pcd, actual_points2instances = SelectionNotZeroProcessor().process(
         config, pcd, src_points2instances
     )
 
