@@ -15,10 +15,14 @@
 from services.preprocessing.init.map import InitMapProcessor
 
 from tests.test_data import config
-from tests.test_data import real_init_map_size
 
 
 def test_init_map():
     init_pcd = InitMapProcessor().process(config)
+
+    real_init_map_size = sum(
+        len(config.dataset.get_point_cloud(i).points)
+        for i in range(config.start_index, config.end_index)
+    )
 
     assert len(init_pcd.points) == real_init_map_size

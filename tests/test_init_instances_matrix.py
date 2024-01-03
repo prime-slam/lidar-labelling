@@ -18,12 +18,15 @@ import pytest
 from services.preprocessing.init.instances_matrix import InitInstancesMatrixProcessor
 
 from tests.test_data import config
-from tests.test_data import real_image_count
 from tests.utils import generate_init_pcd
 
 
 @pytest.mark.parametrize("init_pcd", [generate_init_pcd(config)])
 def test_init_map(init_pcd: o3d.geometry.PointCloud):
     points2instances = InitInstancesMatrixProcessor().process(config, init_pcd)
+
+    real_image_count = config.end_index - (
+        config.start_index - config.start_image_index_offset
+    )
 
     assert points2instances.shape == (len(init_pcd.points), real_image_count)

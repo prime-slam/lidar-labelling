@@ -34,12 +34,3 @@ config = ConfigDTO(
         "voxel_size": 0.25,
     }
 )
-
-real_init_map_size = sum(
-    len(kitti.get_point_cloud(i).points)
-    for i in range(config.start_index, config.end_index)
-)
-
-real_image_count = config.end_index - (
-    config.start_index - config.start_image_index_offset
-)
