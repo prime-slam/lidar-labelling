@@ -72,7 +72,11 @@ from tests.test_data import config
     ],
 )
 def test_voxel_down_sample(
-    src_points, src_points2instances, expected_points, expected_points2instances, expected_trace
+    src_points,
+    src_points2instances,
+    expected_points,
+    expected_points2instances,
+    expected_trace
 ):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(src_points)
@@ -82,8 +86,13 @@ def test_voxel_down_sample(
     )
 
     assert check_result_points(actual_pcd, expected_points) == len(expected_points)
-    assert check_result_points2instances(actual_points2instances, expected_points2instances) == expected_points2instances.shape[0]
     assert check_result_trace(actual_trace, expected_trace) == len(expected_trace)
+    assert (
+        check_result_points2instances(
+            actual_points2instances, expected_points2instances
+        )
+        == expected_points2instances.shape[0]
+    )
 
 
 def check_result_points(actual_pcd, expected_points):
