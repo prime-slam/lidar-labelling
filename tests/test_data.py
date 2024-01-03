@@ -31,6 +31,6 @@ config = ConfigDTO(
         "R": 12,
         "nb_neighbors": 5,
         "std_ratio": 2.0,
-        "voxel_size": 0.25,
+        "voxel_size": 1.0,
     }
 )
