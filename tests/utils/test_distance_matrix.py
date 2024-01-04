@@ -35,26 +35,26 @@ from src.utils.distances_utils import sam_label_distance
             ),
             np.array(
                 [
-                    [0.   ,  1.11,  1.55, 43.76],
-                    [1.11 ,  0.  ,  0.47, 44.81],
-                    [1.55 ,  0.47,  0.  , 45.16],
-                    [43.76, 44.81, 45.16,  0.  ],
+                    [0.0, 1.11, 1.55, 43.76],
+                    [1.11, 0.0, 0.47, 44.81],
+                    [1.55, 0.47, 0.0, 45.16],
+                    [43.76, 44.81, 45.16, 0.0],
                 ]
             ),
             np.array(
                 [
-                    [1.       , 0.0811789, 0.9851119, 0.],
-                    [0.0811789, 1.       , 0.0817001, 0.],
-                    [0.9851119, 0.0817001, 1.       , 0.],
-                    [0.       , 0.       , 0.       , 1.],
+                    [1.0, 0.0811789, 0.9851119, 0.0],
+                    [0.0811789, 1.0, 0.0817001, 0.0],
+                    [0.9851119, 0.0817001, 1.0, 0.0],
+                    [0.0, 0.0, 0.0, 1.0],
                 ]
             ),
             np.array(
                 [
-                    [1.       , 0.0038681, 0.0004307, 0.],
-                    [0.0038681, 1.       , 0.1346603, 0.],
-                    [0.0004307, 0.1346603, 1.       , 0.],
-                    [0.       , 0.       , 0.       , 1.],
+                    [1.0, 0.0038681, 0.0004307, 0.0],
+                    [0.0038681, 1.0, 0.1346603, 0.0],
+                    [0.0004307, 0.1346603, 1.0, 0.0],
+                    [0.0, 0.0, 0.0, 1.0],
                 ]
             ),
         )
@@ -91,5 +91,9 @@ def test_label_distance_calculation(
         sam_features, spatial_distance, beta, 10, alpha
     )
 
-    assert (actual_label_distance_5_001 - expected_label_distance_beta5_alpha001 <= epsilon).all()
-    assert (actual_label_distance_001_5 - expected_label_distance_beta001_alpha5 <= epsilon).all()
+    assert (
+        actual_label_distance_5_001 - expected_label_distance_beta5_alpha001 <= epsilon
+    ).all()
+    assert (
+        actual_label_distance_001_5 - expected_label_distance_beta001_alpha5 <= epsilon
+    ).all()
