@@ -24,7 +24,9 @@ from src.services.normalized_cut_service import normalized_cut
 
 from src.services.preprocessing.common.config import ConfigDTO
 from src.services.preprocessing.init.map import InitMapProcessor
-from src.services.preprocessing.init.instances_matrix import InitInstancesMatrixProcessor
+from src.services.preprocessing.init.instances_matrix import (
+    InitInstancesMatrixProcessor,
+)
 from src.services.preprocessing.not_zero import SelectionNotZeroProcessor
 from src.services.preprocessing.in_cube import SelectionInCubeProcessor
 from src.services.preprocessing.statistical_outlier import StatisticalOutlierProcessor

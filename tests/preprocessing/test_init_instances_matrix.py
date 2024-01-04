@@ -15,7 +15,9 @@
 import open3d as o3d
 import pytest
 
-from src.services.preprocessing.init.instances_matrix import InitInstancesMatrixProcessor
+from src.services.preprocessing.init.instances_matrix import (
+    InitInstancesMatrixProcessor,
+)
 
 from tests.test_data import config
 from tests.utils import generate_init_pcd
