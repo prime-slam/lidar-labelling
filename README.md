@@ -1,5 +1,5 @@
 # lidar-labelling
-[![Linters&Tests](https://github.com/prime-slam/lidar-labelling/actions/workflows/ci.yml/badge.svg)](https://github.com/prime-slam/lidar-labelling/actions/workflows/ci.yml)
+[![tests](https://github.com/prime-slam/lidar-labelling/actions/workflows/ci.yml/badge.svg)](https://github.com/prime-slam/lidar-labelling/actions/workflows/ci.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 lidar-labelling is a tool for automatic segmentation of raw lidar clouds based on image segmentation.
