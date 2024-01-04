@@ -16,7 +16,7 @@ import copy
 import numpy as np
 import open3d as o3d
 
-from utils.image_utils import generate_random_colors
+from src.utils.image_utils import generate_random_colors
 
 
 def visualize_pcd(pcd):

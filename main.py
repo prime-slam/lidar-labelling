@@ -18,21 +18,21 @@ import open3d as o3d
 
 from scipy.spatial.distance import cdist
 
-from pcd_dataset.kitti_dataset import KittiDataset
+from src.datasets.kitti_dataset import KittiDataset
 
-from services.normalized_cut_service import normalized_cut
+from src.services.normalized_cut_service import normalized_cut
 
-from services.preprocessing.common.config import ConfigDTO
-from services.preprocessing.init.map import InitMapProcessor
-from services.preprocessing.init.instances_matrix import InitInstancesMatrixProcessor
-from services.preprocessing.not_zero import SelectionNotZeroProcessor
-from services.preprocessing.in_cube import SelectionInCubeProcessor
-from services.preprocessing.statistical_outlier import StatisticalOutlierProcessor
-from services.preprocessing.voxel_down import VoxelDownProcessor
+from src.services.preprocessing.common.config import ConfigDTO
+from src.services.preprocessing.init.map import InitMapProcessor
+from src.services.preprocessing.init.instances_matrix import InitInstancesMatrixProcessor
+from src.services.preprocessing.not_zero import SelectionNotZeroProcessor
+from src.services.preprocessing.in_cube import SelectionInCubeProcessor
+from src.services.preprocessing.statistical_outlier import StatisticalOutlierProcessor
+from src.services.preprocessing.voxel_down import VoxelDownProcessor
 
-from utils.distances_utils import remove_isolated_points
-from utils.distances_utils import sam_label_distance
-from utils.pcd_utils import color_pcd_by_clusters_and_voxels
+from src.utils.distances_utils import remove_isolated_points
+from src.utils.distances_utils import sam_label_distance
+from src.utils.pcd_utils import color_pcd_by_clusters_and_voxels
 
 
 def main():

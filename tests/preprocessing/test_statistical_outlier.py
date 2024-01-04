@@ -16,7 +16,7 @@ import numpy as np
 import open3d as o3d
 import pytest
 
-from services.preprocessing.statistical_outlier import StatisticalOutlierProcessor
+from src.services.preprocessing.statistical_outlier import StatisticalOutlierProcessor
 
 from tests.test_data import config
 

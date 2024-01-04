@@ -16,7 +16,7 @@ import numpy as np
 import open3d as o3d
 import pytest
 
-from services.preprocessing.not_zero import SelectionNotZeroProcessor
+from src.services.preprocessing.not_zero import SelectionNotZeroProcessor
 
 from tests.test_data import config
 

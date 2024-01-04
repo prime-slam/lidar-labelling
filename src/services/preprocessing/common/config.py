@@ -14,7 +14,7 @@
 
 import attr
 
-from pcd_dataset.abstract_pcd_dataset import AbstractDataset
+from src.datasets.abstract_dataset import AbstractDataset
 
 
 def is_positive(instance, attribute, value):

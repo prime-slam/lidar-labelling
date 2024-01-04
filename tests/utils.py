@@ -15,7 +15,7 @@
 import copy
 import open3d as o3d
 
-from services.preprocessing.common.config import ConfigDTO
+from src.services.preprocessing.common.config import ConfigDTO
 
 
 def generate_init_pcd(config: ConfigDTO):

@@ -16,7 +16,7 @@ import numpy as np
 import open3d as o3d
 import pytest
 
-from services.preprocessing.voxel_down import VoxelDownProcessor
+from src.services.preprocessing.voxel_down import VoxelDownProcessor
 
 from tests.test_data import config
 

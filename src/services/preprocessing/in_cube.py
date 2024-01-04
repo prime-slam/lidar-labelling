@@ -16,8 +16,8 @@ import copy
 import numpy as np
 import zope.interface
 
-from services.preprocessing.common.interface import IProcessor
-from utils.pcd_utils import get_subpcd
+from src.services.preprocessing.common.interface import IProcessor
+from src.utils.pcd_utils import get_subpcd
 
 
 @zope.interface.implementer(IProcessor)

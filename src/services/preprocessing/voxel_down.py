@@ -17,7 +17,7 @@ import numpy as np
 import numpy_indexed as npi
 import zope.interface
 
-from services.preprocessing.common.interface import IProcessor
+from src.services.preprocessing.common.interface import IProcessor
 
 
 @zope.interface.implementer(IProcessor)

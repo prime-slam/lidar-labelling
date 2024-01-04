@@ -16,7 +16,7 @@ import numpy as np
 import open3d as o3d
 import pytest
 
-from services.preprocessing.in_cube import SelectionInCubeProcessor
+from src.services.preprocessing.in_cube import SelectionInCubeProcessor
 
 from tests.test_data import config
 

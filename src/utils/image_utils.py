@@ -20,9 +20,9 @@ import supervision as sv
 from PIL import Image as im
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator
 
-from constants import CHECKPOINT_PATH
-from constants import DEVICE
-from constants import MODEL_TYPE
+from src.constants import CHECKPOINT_PATH
+from src.constants import DEVICE
+from src.constants import MODEL_TYPE
 
 
 def generate_random_colors(N):

@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pcd_dataset.kitti_dataset import KittiDataset
-from services.preprocessing.common.config import ConfigDTO
+from src.datasets.kitti_dataset import KittiDataset
+from src.services.preprocessing.common.config import ConfigDTO
 
 dataset_path = "tests/test_dataset/"
 sequence = "00"

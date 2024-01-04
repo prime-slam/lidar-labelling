@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from services.preprocessing.init.map import InitMapProcessor
+from src.services.preprocessing.init.map import InitMapProcessor
 
 from tests.test_data import config
 

@@ -12,19 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
 import zope.interface
 
-from services.preprocessing.common.interface import IProcessor
-from utils.pcd_utils import remove_statistical_outlier_points
+from src.services.preprocessing.common.interface import IProcessor
+from src.utils.pcd_utils import get_subpcd
 
 
 @zope.interface.implementer(IProcessor)
-class StatisticalOutlierProcessor:
+class SelectionNotZeroProcessor:
     def process(self, config, pcd, points2instances):
-        """Removing statistical outlier points taking into account neighbors and threshold value from the config"""
+        """Selection of pcd points that were labeled on at least one image"""
 
-        pcd, ind = remove_statistical_outlier_points(
-            pcd, config.nb_neighbors, config.std_ratio
-        )
+        not_zero_indices = self.get_not_zero_mask(points2instances)
 
-        return pcd, points2instances[ind]
+        pcd_not_zero = get_subpcd(pcd, not_zero_indices)
+        points2instances_not_zero = points2instances[not_zero_indices]
+
+        return pcd_not_zero, points2instances_not_zero
+
+    def get_not_zero_mask(self, points2instances):
+        """Selection criterion -- in the instance matrix for a point there is at least one non-zero instance value"""
+
+        return np.any(points2instances != 0, axis=1)

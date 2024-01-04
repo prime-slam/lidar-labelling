@@ -12,11 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import torch
+import zope.interface
 
-from pathlib import Path
+from src.services.preprocessing.common.interface import IProcessor
+from src.utils.pcd_utils import remove_statistical_outlier_points
 
-CHECKPOINT_PATH = Path.cwd().joinpath("weights", "sam_vit_h_4b8939.pth")
 
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-MODEL_TYPE = "vit_h"
+@zope.interface.implementer(IProcessor)
+class StatisticalOutlierProcessor:
+    def process(self, config, pcd, points2instances):
+        """Removing statistical outlier points taking into account neighbors and threshold value from the config"""
+
+        pcd, ind = remove_statistical_outlier_points(
+            pcd, config.nb_neighbors, config.std_ratio
+        )
+
+        return pcd, points2instances[ind]

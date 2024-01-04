@@ -16,7 +16,7 @@ import copy
 import open3d as o3d
 import zope.interface
 
-from services.preprocessing.common.interface import IProcessor
+from src.services.preprocessing.common.interface import IProcessor
 
 
 @zope.interface.implementer(IProcessor)
