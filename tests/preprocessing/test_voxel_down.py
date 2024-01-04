@@ -85,6 +85,10 @@ def test_voxel_down_sample(
         config, pcd, src_points2instances
     )
 
+    """It is necessary to check the result by counting matches when iterating through arrays,
+    because the voxel_down_sample_and_trace method renumbers points,
+    as a result of which the order of the rows in the actual and expected arrays may not match
+    """
     assert check_result_points(actual_pcd, expected_points) == len(expected_points)
     assert check_result_trace(actual_trace, expected_trace) == len(expected_trace)
     assert (
@@ -98,14 +102,18 @@ def test_voxel_down_sample(
 def check_result_points(actual_pcd, expected_points):
     actual_points = np.asarray(actual_pcd.points)
 
-    number_of_matched_positions = 0
-    for point1 in actual_points:
-        for point2 in expected_points:
-            if (point1 == point2).all():
-                number_of_matched_positions += 1
-                break
+    matched_points_in_expected = []
 
-    return number_of_matched_positions
+    number_of_matched_points = 0
+    for point1 in actual_points:
+        for id, point2 in enumerate(expected_points):
+            if id not in matched_points_in_expected:
+                if (point1 == point2).all():
+                    number_of_matched_points += 1
+                    matched_points_in_expected.append(id)
+                    break
+
+    return number_of_matched_points
 
 
 def check_result_points2instances(actual_points2instances, expected_points2instances):
