@@ -76,7 +76,7 @@ def test_voxel_down_sample(
     src_points2instances,
     expected_points,
     expected_points2instances,
-    expected_trace
+    expected_trace,
 ):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(src_points)
