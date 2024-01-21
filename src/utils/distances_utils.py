@@ -73,7 +73,7 @@ def remove_isolated_points(dist, points, trace):
     ]
 
     trace_copy = copy.deepcopy(trace)
-    for index in isolated_points:
+    for index in sorted(isolated_points, reverse=True):
         del trace_copy[index]
 
     mask_not_isolated = np.any(dist - np.eye(dist.shape[0]) != 0, axis=1)
