@@ -83,3 +83,43 @@ def remove_isolated_points(dist, points, trace):
         points[mask_not_isolated],
         trace_copy,
     )
+
+def extract_largest_connected_component(dist, points, trace):
+    """Selection the largest connected component of a graph using the dfs algorithm"""
+
+    num_vertices = len(points)
+    half_num_vertices = num_vertices // 2
+    visited_vertices = np.array([False for i in range(num_vertices)], dtype=bool)
+    for i in range(num_vertices):
+        visited_vertices = dfs(dist, i)
+        if visited_vertices.sum() >= half_num_vertices:
+            break
+
+    not_visited_vertices = [ind for ind, vertex in enumerate(visited_vertices) if not vertex]
+
+    trace_copy = copy.deepcopy(trace)
+    for index in sorted(not_visited_vertices, reverse=True):
+        del trace_copy[index]
+
+    return (
+        dist[visited_vertices][:, visited_vertices],
+        points[visited_vertices],
+        trace_copy,
+    )
+
+
+def dfs(distance_matrix, start_vertex):
+    num_vertices = len(distance_matrix)
+    visited = np.array([False for i in range(num_vertices)], dtype=bool)
+    stack = [start_vertex]
+
+    while stack:
+        current_vertex = stack.pop()
+        if not visited[current_vertex]:
+            visited[current_vertex] = True
+
+            for neighbor in range(num_vertices):
+                if distance_matrix[current_vertex][neighbor] > 0 and not visited[neighbor]:
+                    stack.append(neighbor)
+
+    return visited
