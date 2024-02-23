@@ -97,7 +97,7 @@ def extract_largest_connected_component(dist, points, trace):
             break
 
     not_visited_vertices = [
-        ind for ind, vertex in enumerate(visited_vertices) if not vertex
+        vertex for vertex, is_visited in enumerate(visited_vertices) if not is_visited
     ]
 
     trace_copy = copy.deepcopy(trace)
