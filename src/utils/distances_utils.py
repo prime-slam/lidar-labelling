@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 import numpy as np
 
 
@@ -62,53 +61,6 @@ def sam_label_distance(
     )
 
     return label_distance, mask
-
-
-def remove_isolated_points(dist, points, trace):
-    """Removing isolated points that have all 0s in the distance matrix except the diagonal element"""
-
-    mask_isolated = np.all(dist - np.eye(dist.shape[0]) == 0, axis=1)
-    isolated_points = np.array([i for i in range(len(points))], dtype=int)[
-        mask_isolated
-    ]
-
-    trace_copy = copy.deepcopy(trace)
-    for index in sorted(isolated_points, reverse=True):
-        del trace_copy[index]
-
-    mask_not_isolated = np.any(dist - np.eye(dist.shape[0]) != 0, axis=1)
-
-    return (
-        dist[mask_not_isolated][:, mask_not_isolated],
-        points[mask_not_isolated],
-        trace_copy,
-    )
-
-
-def extract_largest_connected_component(dist, points, trace):
-    """Selection the largest connected component of a graph using the dfs algorithm"""
-
-    num_vertices = len(points)
-    half_num_vertices = num_vertices // 2
-    visited_vertices = np.array([False for i in range(num_vertices)], dtype=bool)
-    for i in range(num_vertices):
-        visited_vertices = dfs(dist, i)
-        if visited_vertices.sum() >= half_num_vertices:
-            break
-
-    not_visited_vertices = [
-        vertex for vertex, is_visited in enumerate(visited_vertices) if not is_visited
-    ]
-
-    trace_copy = copy.deepcopy(trace)
-    for index in sorted(not_visited_vertices, reverse=True):
-        del trace_copy[index]
-
-    return (
-        dist[visited_vertices][:, visited_vertices],
-        points[visited_vertices],
-        trace_copy,
-    )
 
 
 def dfs(distance_matrix, start_vertex):
