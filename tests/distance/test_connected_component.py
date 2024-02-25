@@ -16,7 +16,9 @@ import numpy as np
 import pytest
 import open3d as o3d
 
-from src.services.distance.connected_component import ExtractionLargestConnectedComponentProcessor
+from src.services.distance.connected_component import (
+    ExtractionLargestConnectedComponentProcessor,
+)
 
 
 @pytest.mark.parametrize(
@@ -98,8 +100,8 @@ def test_extract_largest_connected_component(
     expected_points,
     expected_trace,
 ):
-    actual_dist, actual_points, actual_trace = ExtractionLargestConnectedComponentProcessor().process(
-        dist, points, trace
+    actual_dist, actual_points, actual_trace = (
+        ExtractionLargestConnectedComponentProcessor().process(dist, points, trace)
     )
 
     assert (actual_dist == expected_dist).all()

@@ -95,8 +95,8 @@ def test_remove_isolated_points(
     expected_points,
     expected_trace,
 ):
-    actual_dist, actual_points, actual_trace = RemovingIsolatedPointsProcessor().process(
-        dist, points, trace
+    actual_dist, actual_points, actual_trace = (
+        RemovingIsolatedPointsProcessor().process(dist, points, trace)
     )
 
     assert (actual_dist == expected_dist).all()

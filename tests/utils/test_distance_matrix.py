@@ -121,14 +121,28 @@ def test_dfs(distance_matrix):
     actual_visited_vertices_1 = dfs(distance_matrix, start_vertex=1)
     expected_visited_vertices_1 = np.array(
         [
-            True, True, True, False, False, False, False, False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
         ]
     )
 
-    actual_visited_vertices_7 = dfs(distance_matrix, start_vertex=4)
+    actual_visited_vertices_7 = dfs(distance_matrix, start_vertex=7)
     expected_visited_vertices_7 = np.array(
         [
-            False, False, False, True, True, True, True, True,
+            False,
+            False,
+            False,
+            True,
+            True,
+            True,
+            True,
+            True,
         ]
     )
     assert (actual_visited_vertices_1 == expected_visited_vertices_1).all()
