@@ -42,7 +42,7 @@ class ExtractionLargestConnectedComponentProcessor:
         ]
 
         # Visualization of the extracted connectivity component against the background of the entire cloud
-        visualize_pcd(color_pcd_by_two_groups(points, not_visited_vertices))
+        # visualize_pcd(color_pcd_by_two_groups(points, not_visited_vertices))
 
         trace_copy = copy.deepcopy(trace)
         for index in sorted(not_visited_vertices, reverse=True):
