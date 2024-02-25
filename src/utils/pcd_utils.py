@@ -103,9 +103,7 @@ def color_pcd_by_two_groups(points, indices):
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(np.asarray(points))
-    pcd.colors = o3d.utility.Vector3dVector(
-        np.zeros(np.asarray(pcd.points).shape)
-    )
+    pcd.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
 
     colors = generate_random_colors(2)
     for i in range(len(pcd.points)):

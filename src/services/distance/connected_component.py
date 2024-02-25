@@ -36,10 +36,12 @@ class ExtractionLargestConnectedComponentProcessor:
                 break
 
         not_visited_vertices = [
-            vertex for vertex, is_visited in enumerate(visited_vertices) if not is_visited
+            vertex
+            for vertex, is_visited in enumerate(visited_vertices)
+            if not is_visited
         ]
 
-        #Visualization of the extracted connectivity component against the background of the entire cloud
+        # Visualization of the extracted connectivity component against the background of the entire cloud
         visualize_pcd(color_pcd_by_two_groups(points, not_visited_vertices))
 
         trace_copy = copy.deepcopy(trace)

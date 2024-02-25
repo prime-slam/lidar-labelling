@@ -24,7 +24,9 @@ class RemovingIsolatedPointsProcessor:
     def process(self, distance_matrix, points, trace):
         """Removing isolated points that have all 0s in the distance matrix except the diagonal element"""
 
-        mask_isolated = np.all(distance_matrix - np.eye(distance_matrix.shape[0]) == 0, axis=1)
+        mask_isolated = np.all(
+            distance_matrix - np.eye(distance_matrix.shape[0]) == 0, axis=1
+        )
         isolated_points = np.array([i for i in range(len(points))], dtype=int)[
             mask_isolated
         ]
@@ -33,7 +35,9 @@ class RemovingIsolatedPointsProcessor:
         for index in sorted(isolated_points, reverse=True):
             del trace_copy[index]
 
-        mask_not_isolated = np.any(distance_matrix - np.eye(distance_matrix.shape[0]) != 0, axis=1)
+        mask_not_isolated = np.any(
+            distance_matrix - np.eye(distance_matrix.shape[0]) != 0, axis=1
+        )
 
         return (
             distance_matrix[mask_not_isolated][:, mask_not_isolated],
