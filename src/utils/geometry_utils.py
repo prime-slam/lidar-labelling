@@ -35,7 +35,7 @@ def find_intersection(bbox1, bbox2):
     y_top = max(y1_bbox1, y1_bbox2)
     y_bottom = min(y2_bbox1, y2_bbox2)
 
-    return x_left, y_top, x_right - x_left, y_bottom - y_top
+    return [x_left, y_top, x_right - x_left, y_bottom - y_top]
 
 
 def find_union(bbox1, bbox2):
@@ -52,7 +52,7 @@ def find_union(bbox1, bbox2):
     x_right = max(x2_bbox1, x2_bbox2)
     y_bottom = max(y2_bbox1, y2_bbox2)
 
-    return x_left, y_top, x_right - x_left, y_bottom - y_top
+    return [x_left, y_top, x_right - x_left, y_bottom - y_top]
 
 
 def calculate_area(bbox):
