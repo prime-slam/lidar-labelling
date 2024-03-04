@@ -17,8 +17,11 @@ import numpy as np
 import zope.interface
 
 from src.services.preprocessing.common.interface import IProcessor
+from src.utils.geometry_utils import calculate_area
 from src.utils.pcd_utils import get_subpcd
 from src.utils.pcd_utils import get_visible_points
+from src.utils.sam_mask_utils import find_intersection_mask
+from src.utils.sam_mask_utils import find_union_mask
 
 
 @zope.interface.implementer(IProcessor)
@@ -56,7 +59,8 @@ class InitInstancesMatrixProcessor:
         points2instances = np.zeros((N, end_image_index - start_image_index), dtype=int)
 
         for view_id, view in enumerate(range(start_image_index, end_image_index)):
-            masks = dataset.get_image_instances(cam_name, view)
+            full_masks = dataset.get_image_instances(cam_name, view)
+            masks = self.reduce_detail(full_masks)
             image_labels = self.masks_to_image(masks)
 
             T = dataset.get_lidar_pose(view)
@@ -111,3 +115,52 @@ class InitInstancesMatrixProcessor:
         for i, mask in enumerate(masks):
             image_labels[mask["segmentation"]] = i + 1
         return image_labels
+
+    def reduce_detail(self, masks, intersection_to_union_ratio_threshold=0.35):
+        merged_mask = []
+        merged_indices = []
+
+        for i in range(len(masks)):
+            if i in merged_indices:
+                continue
+
+            area_bbox_i = calculate_area(masks[i]['bbox'])
+
+            indices_merged_with_i = []
+            for j in range(i + 1, len(masks)):
+                if j in merged_indices:
+                    continue
+
+                area_bbox_j = calculate_area(masks[j]['bbox'])
+
+                intersection_mask = find_intersection_mask(masks[i], masks[j])
+                if intersection_mask == None:
+                    continue
+                area_intersection = intersection_mask['area']
+
+                area_bbox_intersection = calculate_area(intersection_mask['bbox'])
+                area_bbox_union = area_bbox_i + area_bbox_j - area_bbox_intersection
+                IU_ratio = area_bbox_intersection / area_bbox_union
+
+                if (IU_ratio >= intersection_to_union_ratio_threshold
+                    or area_intersection / masks[i]['area'] >= 0.6
+                    or area_intersection / masks[j]['area'] >= 0.6):
+                    masks[i] = find_union_mask(masks[i], masks[j])
+                    indices_merged_with_i.append(j)
+
+            if indices_merged_with_i:
+                merged_mask.append(masks[i])
+
+                merged_indices.append(i)
+                for ind in indices_merged_with_i:
+                    merged_indices.append(ind)
+
+        masks_result = []
+        for ind, mask in enumerate(masks):
+            if ind not in merged_indices:
+                masks_result.append(mask)
+
+        for mask in merged_mask:
+            masks_result.append(mask)
+
+        return masks_result
