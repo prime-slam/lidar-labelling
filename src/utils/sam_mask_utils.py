@@ -19,26 +19,26 @@ from src.utils.geometry_utils import find_union
 
 
 def find_intersection_mask(mask1, mask2):
-    bbox = find_intersection(mask1['bbox'], mask2['bbox'])
+    bbox = find_intersection(mask1["bbox"], mask2["bbox"])
     if bbox == None:
         return None
-    segmentation = mask1['segmentation'] * mask2['segmentation']
+    segmentation = mask1["segmentation"] * mask2["segmentation"]
     area = segmentation.sum()
 
     intersection_mask = copy.deepcopy(mask1)
-    intersection_mask['segmentation'] = segmentation
-    intersection_mask['bbox'] = bbox
-    intersection_mask['area'] = area
+    intersection_mask["segmentation"] = segmentation
+    intersection_mask["bbox"] = bbox
+    intersection_mask["area"] = area
     return intersection_mask
 
 
 def find_union_mask(mask1, mask2):
-    segmentation = mask1['segmentation'] + mask2['segmentation']
-    bbox = find_union(mask1['bbox'], mask2['bbox'])
+    segmentation = mask1["segmentation"] + mask2["segmentation"]
+    bbox = find_union(mask1["bbox"], mask2["bbox"])
     area = segmentation.sum()
 
     union_mask = copy.deepcopy(mask1)
-    union_mask['segmentation'] = segmentation
-    union_mask['bbox'] = bbox
-    union_mask['area'] = area
+    union_mask["segmentation"] = segmentation
+    union_mask["bbox"] = bbox
+    union_mask["area"] = area
     return union_mask

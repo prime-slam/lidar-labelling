@@ -22,9 +22,14 @@ def find_intersection(bbox1, bbox2):
     x2_bbox2 = x1_bbox2 + w_bbox2
     y2_bbox2 = y1_bbox2 + h_bbox2
 
-    if (x1_bbox1 > x2_bbox2 or x2_bbox1 < x1_bbox2 or y1_bbox1 > y2_bbox2 or y2_bbox1 < y1_bbox2):
+    if (
+        x1_bbox1 > x2_bbox2
+        or x2_bbox1 < x1_bbox2
+        or y1_bbox1 > y2_bbox2
+        or y2_bbox1 < y1_bbox2
+    ):
         return None
-    
+
     x_left = max(x1_bbox1, x1_bbox2)
     x_right = min(x2_bbox1, x2_bbox2)
     y_top = max(y1_bbox1, y1_bbox2)

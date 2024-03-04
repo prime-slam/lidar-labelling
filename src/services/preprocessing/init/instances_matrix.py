@@ -124,27 +124,29 @@ class InitInstancesMatrixProcessor:
             if i in merged_indices:
                 continue
 
-            area_bbox_i = calculate_area(masks[i]['bbox'])
+            area_bbox_i = calculate_area(masks[i]["bbox"])
 
             indices_merged_with_i = []
             for j in range(i + 1, len(masks)):
                 if j in merged_indices:
                     continue
 
-                area_bbox_j = calculate_area(masks[j]['bbox'])
+                area_bbox_j = calculate_area(masks[j]["bbox"])
 
                 intersection_mask = find_intersection_mask(masks[i], masks[j])
                 if intersection_mask == None:
                     continue
-                area_intersection = intersection_mask['area']
+                area_intersection = intersection_mask["area"]
 
-                area_bbox_intersection = calculate_area(intersection_mask['bbox'])
+                area_bbox_intersection = calculate_area(intersection_mask["bbox"])
                 area_bbox_union = area_bbox_i + area_bbox_j - area_bbox_intersection
                 IU_ratio = area_bbox_intersection / area_bbox_union
 
-                if (IU_ratio >= intersection_to_union_ratio_threshold
-                    or area_intersection / masks[i]['area'] >= 0.6
-                    or area_intersection / masks[j]['area'] >= 0.6):
+                if (
+                    IU_ratio >= intersection_to_union_ratio_threshold
+                    or area_intersection / masks[i]["area"] >= 0.6
+                    or area_intersection / masks[j]["area"] >= 0.6
+                ):
                     masks[i] = find_union_mask(masks[i], masks[j])
                     indices_merged_with_i.append(j)
 
