@@ -157,8 +157,7 @@ def test_find_union_mask(
 ):
     actual_union_mask = find_union_mask(mask1, mask2)
     assert (
-        actual_union_mask["segmentation"]
-        == expected_union_mask["segmentation"]
+        actual_union_mask["segmentation"] == expected_union_mask["segmentation"]
     ).all()
     assert actual_union_mask["bbox"] == expected_union_mask["bbox"]
     assert actual_union_mask["area"] == expected_union_mask["area"]
