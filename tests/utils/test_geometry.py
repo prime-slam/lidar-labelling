@@ -29,9 +29,7 @@ def test_find_intersection_none_result():
 
 
 @pytest.mark.parametrize(
-    "bbox1, "
-    "bbox2, "
-    "expected_bbox_intersection",
+    "bbox1, " "bbox2, " "expected_bbox_intersection",
     [
         (
             [7, 1, 2, 6],
@@ -50,9 +48,7 @@ def test_find_intersection(
 
 
 @pytest.mark.parametrize(
-    "bbox1, "
-    "bbox2, "
-    "expected_bbox_union",
+    "bbox1, " "bbox2, " "expected_bbox_union",
     [
         (
             [2, 1, 3, 2],

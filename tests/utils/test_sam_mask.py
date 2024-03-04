@@ -20,9 +20,7 @@ from src.utils.sam_mask_utils import find_union_mask
 
 
 @pytest.mark.parametrize(
-    "mask1, "
-    "mask2, "
-    "expected_intersection_mask",
+    "mask1, " "mask2, " "expected_intersection_mask",
     [
         (
             {
@@ -67,14 +65,16 @@ def test_find_intersection_mask(
     expected_intersection_mask,
 ):
     actual_intersection_mask = find_intersection_mask(mask1, mask2)
-    assert (actual_intersection_mask["segmentation"] == expected_intersection_mask["segmentation"]).all()
+    assert (
+        actual_intersection_mask["segmentation"]
+        == expected_intersection_mask["segmentation"]
+    ).all()
     assert actual_intersection_mask["bbox"] == expected_intersection_mask["bbox"]
     assert actual_intersection_mask["area"] == expected_intersection_mask["area"]
 
 
 @pytest.mark.parametrize(
-    "mask1, "
-    "mask2",
+    "mask1, " "mask2",
     [
         (
             {
@@ -111,9 +111,7 @@ def test_find_intersection_mask_none_result(
 
 
 @pytest.mark.parametrize(
-    "mask1, "
-    "mask2, "
-    "expected_union_mask",
+    "mask1, " "mask2, " "expected_union_mask",
     [
         (
             {
@@ -158,6 +156,9 @@ def test_find_union_mask(
     expected_union_mask,
 ):
     actual_union_mask = find_union_mask(mask1, mask2)
-    assert (actual_union_mask["segmentation"] == expected_union_mask["segmentation"]).all()
+    assert (
+        actual_union_mask["segmentation"]
+        == expected_union_mask["segmentation"]
+    ).all()
     assert actual_union_mask["bbox"] == expected_union_mask["bbox"]
     assert actual_union_mask["area"] == expected_union_mask["area"]
