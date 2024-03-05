@@ -116,9 +116,33 @@ class InitInstancesMatrixProcessor:
             image_labels[mask["segmentation"]] = i + 1
         return image_labels
 
-    def reduce_detail(self, masks, intersection_to_union_ratio_threshold=0.35):
+    def reduce_detail(self, masks, intersection_to_union_threshold=0.35, intersection_to_mask_threshold=0.6):
+        """Reducing the detail of masks by combining several masks into one
+
+        Parameters
+        ----------
+        masks : list of dicts
+            each mask is a dictionary with the following keys :
+                "segmentation" : matrix
+                    two-dimensional array of True False by the number of pixels of the image
+                "bbox" : array
+                    the box around the mask, in xywh format
+                "area" : int
+                    the area in pixels of the mask
+
+        intersection_to_union_threshold : float
+            two masks whose ratio of the intersection area of the bounding boxes
+            to the union area is greater than or equal this threshold will be merged into one mask
+
+        intersection_to_mask_threshold : float
+            threshold for the ratio of the number of pixels in the intersection of masks
+            to the number of pixels in one mask
+            for example, if half the pixels of a mask belong to the intersection
+            with another mask, then combine them into one mask
+        """
+
         merged_mask = []
-        merged_indices = []
+        merged_indices = [] #indices in the original masks that were merged
 
         for i in range(len(masks)):
             if i in merged_indices:
@@ -143,15 +167,15 @@ class InitInstancesMatrixProcessor:
                 IU_ratio = area_bbox_intersection / area_bbox_union
 
                 if (
-                    IU_ratio >= intersection_to_union_ratio_threshold
-                    or area_intersection / masks[i]["area"] >= 0.6
-                    or area_intersection / masks[j]["area"] >= 0.6
+                    IU_ratio >= intersection_to_union_threshold
+                    or area_intersection / masks[i]["area"] >= intersection_to_mask_threshold
+                    or area_intersection / masks[j]["area"] >= intersection_to_mask_threshold
                 ):
-                    masks[i] = find_union_mask(masks[i], masks[j])
+                    masks[i] = find_union_mask(masks[i], masks[j]) #the union is placed in the masks[i]
                     indices_merged_with_i.append(j)
 
             if indices_merged_with_i:
-                merged_mask.append(masks[i])
+                merged_mask.append(masks[i]) #the final result of the union is extracted from the masks[i]
 
                 merged_indices.append(i)
                 for ind in indices_merged_with_i:
@@ -160,7 +184,7 @@ class InitInstancesMatrixProcessor:
         masks_result = []
         for ind, mask in enumerate(masks):
             if ind not in merged_indices:
-                masks_result.append(mask)
+                masks_result.append(mask) #save it unchanged
 
         for mask in merged_mask:
             masks_result.append(mask)
