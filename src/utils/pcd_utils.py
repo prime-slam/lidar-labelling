@@ -105,12 +105,12 @@ def color_pcd_by_two_groups(points, indices):
     pcd.points = o3d.utility.Vector3dVector(np.asarray(points))
     pcd.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
 
-    colors = generate_random_colors(2)
+    colors = generate_random_colors(3)
     for i in range(len(pcd.points)):
         pcd.colors[i] = colors[1]
 
     for i in range(len(indices)):
-        pcd.colors[indices[i]] = colors[0]
+        pcd.colors[indices[i]] = colors[2]
 
     return pcd
 

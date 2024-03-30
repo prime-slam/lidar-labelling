@@ -27,4 +27,4 @@ class StatisticalOutlierProcessor:
             pcd, config.nb_neighbors, config.std_ratio
         )
 
-        return pcd, points2instances[ind]
+        return pcd, points2instances[ind], ind
