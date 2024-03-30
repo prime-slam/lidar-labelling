@@ -87,8 +87,8 @@ def test_remove_statistical_outlier(
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(src_points)
 
-    actual_pcd, actual_points2instances, indices = StatisticalOutlierProcessor().process(
-        config, pcd, src_points2instances
+    actual_pcd, actual_points2instances, indices = (
+        StatisticalOutlierProcessor().process(config, pcd, src_points2instances)
     )
 
     assert (np.asarray(actual_pcd.points) == expected_points).all()
