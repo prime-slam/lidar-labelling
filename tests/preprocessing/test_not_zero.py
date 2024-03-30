@@ -77,7 +77,7 @@ def test_select_not_zero(
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(src_points)
 
-    actual_pcd, actual_points2instances = SelectionNotZeroProcessor().process(
+    actual_pcd, actual_points2instances, indices = SelectionNotZeroProcessor().process(
         config, pcd, src_points2instances
     )
 
