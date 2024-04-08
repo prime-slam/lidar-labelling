@@ -72,7 +72,7 @@ class InitInstancesMatrixProcessor:
             masks = self.reduce_detail(
                 full_masks,
                 reduce_detail_int_to_union_threshold,
-                reduce_detail_int_to_mask_threshold
+                reduce_detail_int_to_mask_threshold,
             )
             image_labels = self.masks_to_image(masks)
 
