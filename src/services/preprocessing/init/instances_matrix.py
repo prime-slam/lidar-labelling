@@ -40,13 +40,20 @@ class InitInstancesMatrixProcessor:
             config.start_index - config.start_image_index_offset,
             config.end_index,
             config.reduce_detail_int_to_union_threshold,
-            config.reduce_detail_int_to_mask_threshold
+            config.reduce_detail_int_to_mask_threshold,
         )
 
         return points2instances
 
     def build_points2instances_matrix(
-        self, map_wc, dataset, cam_name, start_image_index, end_image_index, reduce_detail_int_to_union_threshold, reduce_detail_int_to_mask_threshold
+        self,
+        map_wc,
+        dataset,
+        cam_name,
+        start_image_index,
+        end_image_index,
+        reduce_detail_int_to_union_threshold,
+        reduce_detail_int_to_mask_threshold,
     ):
         """The map is moved to the camera coordinate system at the moment the current image is taken.
         The function for removing hidden points is called (get_visible_points).
@@ -62,7 +69,11 @@ class InitInstancesMatrixProcessor:
 
         for view_id, view in enumerate(range(start_image_index, end_image_index)):
             full_masks = dataset.get_image_instances(cam_name, view)
-            masks = self.reduce_detail(full_masks, reduce_detail_int_to_union_threshold, reduce_detail_int_to_mask_threshold)
+            masks = self.reduce_detail(
+                full_masks,
+                reduce_detail_int_to_union_threshold,
+                reduce_detail_int_to_mask_threshold
+            )
             image_labels = self.masks_to_image(masks)
 
             T = dataset.get_lidar_pose(view)

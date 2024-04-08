@@ -70,23 +70,27 @@ class ConfigDTO:
     dataset: AbstractDataset = attr.ib()
 
     alpha_physical_distance: int = attr.ib(
-        validator=[attr.validators.instance_of(int),] #default=5
+        validator=[
+            attr.validators.instance_of(int),
+        ]  # default=5
     )
 
     beta_instance_distance: int = attr.ib(
-        validator=[attr.validators.instance_of(int),] #default=3
+        validator=[
+            attr.validators.instance_of(int),
+        ]  # default=3
     )
 
     T_normalized_cut: float = attr.ib(
-        validator=[attr.validators.instance_of(float)] #default=0.01
+        validator=[attr.validators.instance_of(float)]  # default=0.01
     )
 
     reduce_detail_int_to_union_threshold: float = attr.ib(
-        validator=[attr.validators.instance_of(float)] #default=0.5
+        validator=[attr.validators.instance_of(float)]  # default=0.5
     )
 
     reduce_detail_int_to_mask_threshold: float = attr.ib(
-        validator=[attr.validators.instance_of(float)] #default=0.6
+        validator=[attr.validators.instance_of(float)]  # default=0.6
     )
 
     start_index: int = attr.ib(
