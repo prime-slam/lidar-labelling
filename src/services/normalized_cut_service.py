@@ -76,7 +76,7 @@ def get_min_ncut(ev, d, w, num_cuts):
     return min_mask, mcut
 
 
-def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
+def normalized_cut(w, labels, T, eigenvalues_count=2):
     """Implementation of the GraphCut algorithm for segmentation labels based on a matrix of distances W between them
 
     Parameters
@@ -110,7 +110,6 @@ def normalized_cut(w, labels, T=0.01, eigenvalues_count=2):
         ev = eigvecs[:, index2]
 
         mask, mcut = get_min_ncut(ev, D, w, 10)
-        print("mcut = {}".format(mcut))
 
         if mcut < T:
             labels1 = normalized_cut(

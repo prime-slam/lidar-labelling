@@ -38,7 +38,7 @@ class SelectionInCubeProcessor:
         pcd_in_cube = get_subpcd(pcd, close_point_indices)
         points2instances_in_cube = points2instances[close_point_indices]
 
-        return pcd_in_cube, points2instances_in_cube
+        return pcd_in_cube, points2instances_in_cube, close_point_indices
 
     def get_close_point_indices_cube(self, pcd, center, R):
         """Sampling pcd indices inside a cube

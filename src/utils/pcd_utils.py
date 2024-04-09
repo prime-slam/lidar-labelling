@@ -90,6 +90,31 @@ def get_visible_points(pcd_centered, visualize=False):
     return indices_visible
 
 
+def color_pcd_by_two_groups(points, indices):
+    """Cloud coloring by group of given indices and remaining indices at points
+
+    Parameters
+    ----------
+    points : numpy.array
+        points of the cloud to be colored
+    indices : numpy.array
+        indices of points that belong to the same group
+    """
+
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(np.asarray(points))
+    pcd.colors = o3d.utility.Vector3dVector(np.zeros(np.asarray(pcd.points).shape))
+
+    colors = generate_random_colors(3)
+    for i in range(len(pcd.points)):
+        pcd.colors[i] = colors[1]
+
+    for i in range(len(indices)):
+        pcd.colors[indices[i]] = colors[2]
+
+    return pcd
+
+
 def color_pcd_by_labels(pcd, labels):
     """Cloud coloring after constructing an instance matrix by labels colors
 

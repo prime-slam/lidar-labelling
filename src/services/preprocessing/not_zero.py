@@ -29,7 +29,7 @@ class SelectionNotZeroProcessor:
         pcd_not_zero = get_subpcd(pcd, not_zero_indices)
         points2instances_not_zero = points2instances[not_zero_indices]
 
-        return pcd_not_zero, points2instances_not_zero
+        return pcd_not_zero, points2instances_not_zero, not_zero_indices
 
     def get_not_zero_mask(self, points2instances):
         """Selection criterion -- in the instance matrix for a point there is at least one non-zero instance value"""

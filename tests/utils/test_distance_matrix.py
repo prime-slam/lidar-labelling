@@ -15,6 +15,7 @@
 import numpy as np
 import pytest
 
+from src.utils.distances_utils import dfs
 from src.utils.distances_utils import sam_label_distance
 
 
@@ -97,3 +98,52 @@ def test_label_distance_calculation(
     assert (
         actual_label_distance_001_5 - expected_label_distance_beta001_alpha5 <= epsilon
     ).all()
+
+
+@pytest.mark.parametrize(
+    "distance_matrix",
+    [
+        np.array(
+            [
+                [1.0, 0.2, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.2, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.3, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0, 0.5, 0.6, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.5, 1.0, 0.0, 0.7, 0.0],
+                [0.0, 0.0, 0.0, 0.6, 0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0, 0.7, 0.0, 1.0, 0.8],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.8, 1.0],
+            ]
+        ),
+    ],
+)
+def test_dfs(distance_matrix):
+    actual_visited_vertices_1 = dfs(distance_matrix, start_vertex=1)
+    expected_visited_vertices_1 = np.array(
+        [
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+        ]
+    )
+
+    actual_visited_vertices_7 = dfs(distance_matrix, start_vertex=7)
+    expected_visited_vertices_7 = np.array(
+        [
+            False,
+            False,
+            False,
+            True,
+            True,
+            True,
+            True,
+            True,
+        ]
+    )
+    assert (actual_visited_vertices_1 == expected_visited_vertices_1).all()
+    assert (actual_visited_vertices_7 == expected_visited_vertices_7).all()

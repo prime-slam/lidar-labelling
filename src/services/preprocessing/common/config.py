@@ -18,7 +18,7 @@ from src.datasets.abstract_dataset import AbstractDataset
 
 
 def is_positive(instance, attribute, value):
-    if value <= 0:
+    if value < 0:
         raise ValueError("{} has to be positive!".format(attribute.name))
 
 
@@ -69,17 +69,40 @@ class ConfigDTO:
 
     dataset: AbstractDataset = attr.ib()
 
+    alpha_physical_distance: int = attr.ib(
+        validator=[
+            attr.validators.instance_of(int),
+        ]  # default=5
+    )
+
+    beta_instance_distance: int = attr.ib(
+        validator=[
+            attr.validators.instance_of(int),
+        ]  # default=3
+    )
+
+    T_normalized_cut: float = attr.ib(
+        validator=[attr.validators.instance_of(float)]  # default=0.01
+    )
+
+    reduce_detail_int_to_union_threshold: float = attr.ib(
+        validator=[attr.validators.instance_of(float)]  # default=0.5
+    )
+
+    reduce_detail_int_to_mask_threshold: float = attr.ib(
+        validator=[attr.validators.instance_of(float)]  # default=0.6
+    )
+
     start_index: int = attr.ib(
-        default=5, validator=[attr.validators.instance_of(int), is_positive]
+        validator=[attr.validators.instance_of(int), is_positive]
     )
     end_index: int = attr.ib(
-        default=10, validator=[attr.validators.instance_of(int), end_greater_than_start]
+        validator=[attr.validators.instance_of(int), end_greater_than_start]
     )
     start_image_index_offset: int = attr.ib(
         default=3,
         validator=[
             attr.validators.instance_of(int),
-            is_positive,
             image_offset_less_than_start_index,
         ],
     )

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 import numpy as np
 
 
@@ -64,22 +63,21 @@ def sam_label_distance(
     return label_distance, mask
 
 
-def remove_isolated_points(dist, points, trace):
-    """Removing isolated points that have all 0s in the distance matrix except the diagonal element"""
+def dfs(distance_matrix, start_vertex):
+    num_vertices = len(distance_matrix)
+    visited = np.array([False for i in range(num_vertices)], dtype=bool)
+    stack = [start_vertex]
 
-    mask_isolated = np.all(dist - np.eye(dist.shape[0]) == 0, axis=1)
-    isolated_points = np.array([i for i in range(len(points))], dtype=int)[
-        mask_isolated
-    ]
+    while stack:
+        current_vertex = stack.pop()
+        if not visited[current_vertex]:
+            visited[current_vertex] = True
 
-    trace_copy = copy.deepcopy(trace)
-    for index in isolated_points:
-        del trace_copy[index]
+            for neighbor in range(num_vertices):
+                if (
+                    distance_matrix[current_vertex][neighbor] > 0
+                    and not visited[neighbor]
+                ):
+                    stack.append(neighbor)
 
-    mask_not_isolated = np.any(dist - np.eye(dist.shape[0]) != 0, axis=1)
-
-    return (
-        dist[mask_not_isolated][:, mask_not_isolated],
-        points[mask_not_isolated],
-        trace_copy,
-    )
+    return visited

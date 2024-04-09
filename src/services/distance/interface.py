@@ -14,17 +14,12 @@
 
 import zope.interface
 
-from src.services.preprocessing.common.interface import IProcessor
-from src.utils.pcd_utils import remove_statistical_outlier_points
 
+class IProcessor(zope.interface.Interface):
+    def process(distance_matrix, points, trace):
+        """Extracting only those points that have certain properties
+        based on the distance matrix.
 
-@zope.interface.implementer(IProcessor)
-class StatisticalOutlierProcessor:
-    def process(self, config, pcd, points2instances):
-        """Removing statistical outlier points taking into account neighbors and threshold value from the config"""
-
-        pcd, ind = remove_statistical_outlier_points(
-            pcd, config.nb_neighbors, config.std_ratio
-        )
-
-        return pcd, points2instances[ind], ind
+        The result of processing is a distance matrix, a set of points
+        and a trace that contains only those points that satisfy the desired property.
+        """

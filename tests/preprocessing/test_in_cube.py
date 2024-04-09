@@ -79,7 +79,7 @@ def test_select_points_in_cube(
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(src_points)
 
-    actual_pcd, actual_points2instances = SelectionInCubeProcessor().process(
+    actual_pcd, actual_points2instances, indices = SelectionInCubeProcessor().process(
         config, pcd, src_points2instances
     )
 
