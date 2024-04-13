@@ -29,7 +29,9 @@ def find_num_in_inst_label_array(src_points, inst_label_array_for_clustering):
     return -1
 
 
-def build_pred_inst_array(inst_label_array_for_clustering, clusters, trace, instance_threshold):
+def build_pred_inst_array(
+    inst_label_array_for_clustering, clusters, trace, instance_threshold
+):
     pred_inst_array = np.zeros(len(inst_label_array_for_clustering), dtype=int)
     k = 0
     free_id = 1
@@ -37,11 +39,15 @@ def build_pred_inst_array(inst_label_array_for_clustering, clusters, trace, inst
         voxel_not_in_gt_cluster_count = 0
         for voxel in cluster:
             src_points = trace[voxel]
-            id = find_num_in_inst_label_array(src_points, inst_label_array_for_clustering)
+            id = find_num_in_inst_label_array(
+                src_points, inst_label_array_for_clustering
+            )
             if id == -1:
                 voxel_not_in_gt_cluster_count += 1
 
-        cluster_in_gt_instance = ((len(cluster) - voxel_not_in_gt_cluster_count) / len(cluster)) * 100
+        cluster_in_gt_instance = (
+            (len(cluster) - voxel_not_in_gt_cluster_count) / len(cluster)
+        ) * 100
         if cluster_in_gt_instance >= instance_threshold:
             for voxel in cluster:
                 src_points = trace[voxel]
@@ -57,9 +63,8 @@ def main():
     from_num = 0
     to_num = 4540
 
-    # execution_ids = [ 1, 2, 3, 4 ]
-    execution_ids = [ 4 ]
-    instance_thresholds = [ 5, 20, 30, 50 ]
+    execution_ids = [4]
+    instance_thresholds = [5, 20, 30, 50]
 
     for execution_id in execution_ids:
 
@@ -69,22 +74,30 @@ def main():
             current_from_num = from_num
 
             skipped = 0
-            while (current_from_num < to_num):
+            while current_from_num < to_num:
                 start_index = current_from_num
                 end_index = start_index + 4
 
-                file_name = "experiment_bin_0704_4_sem_offset0_T0l03/start{}_end{}.pickle".format(start_index, end_index)
+                file_name = "experiment_bin_0704_4_sem_offset0_T0l03/start{}_end{}.pickle".format(
+                    start_index, end_index
+                )
 
-                with open(file_name, 'rb') as file:
+                with open(file_name, "rb") as file:
                     data = pickle.load(file)
 
                 trace = data[2]
                 clusters = data[3]
                 inst_label_array_for_clustering = data[4]
 
-                if inst_label_array_for_clustering.sum() == 0:  # в облаке нет инстансов => скип
+                if (
+                    inst_label_array_for_clustering.sum() == 0
+                ):  # в облаке нет инстансов => пропускаем
                     skipped += 1
-                    print("start_index={}, end_index={} skip".format(start_index, end_index))
+                    print(
+                        "start_index={}, end_index={} skip".format(
+                            start_index, end_index
+                        )
+                    )
                     current_from_num = end_index
                     continue
 
@@ -92,7 +105,7 @@ def main():
                     copy.deepcopy(inst_label_array_for_clustering),
                     clusters,
                     copy.deepcopy(trace),
-                    instance_threshold
+                    instance_threshold,
                 )
 
                 pred_labels = pred_inst_array
@@ -108,19 +121,27 @@ def main():
                 pred_labels_unique = set(pred_labels)
                 pred_labels_unique.discard(0)
 
-                with open("experiment_1004_{}_without0_sem_offset0_T0l03_{}.csv".format(execution_id, instance_threshold), "a", newline="") as file:
+                with open(
+                    "experiment_1004_{}_without0_sem_offset0_T0l03_{}.csv".format(
+                        execution_id, instance_threshold
+                    ),
+                    "a",
+                    newline="",
+                ) as file:
                     writer = csv.writer(file)
 
-                    writer.writerow([
-                        str(start_index),
-                        str(end_index),
-                        str(precision_res),
-                        str(recall_res),
-                        str(fScore_res),
-                        len(gt_labels_unique),
-                        len(pred_labels_unique),
-                        len(clusters),
-                    ])
+                    writer.writerow(
+                        [
+                            str(start_index),
+                            str(end_index),
+                            str(precision_res),
+                            str(recall_res),
+                            str(fScore_res),
+                            len(gt_labels_unique),
+                            len(pred_labels_unique),
+                            len(clusters),
+                        ]
+                    )
 
                 current_from_num = end_index
 
