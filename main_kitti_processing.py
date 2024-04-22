@@ -77,7 +77,11 @@ def build_tuple_bin_saving(
 
     return (
         {"config": params},
-        {"pcd_for_clustering_before_voxelization_points": np.asarray(pcd_for_clustering.points)},
+        {
+            "pcd_for_clustering_before_voxelization_points": np.asarray(
+                pcd_for_clustering.points
+            )
+        },
         {"voxel_pcd_original_points": np.asarray(voxel_pcd.points)},
         {"voxel_trace_original": src_trace_arrays},
         {"trace_graphcut": trace_arrays},
@@ -160,7 +164,12 @@ def segment_pcds(config):
 
 
 def process_kitti(
-    from_num, to_num, id_exec, alpha_physical_distance, beta_instance_distance, T_normalized_cut
+    from_num,
+    to_num,
+    id_exec,
+    alpha_physical_distance,
+    beta_instance_distance,
+    T_normalized_cut,
 ):
 
     reduce_detail_int_to_union_threshold = 0.5
@@ -192,10 +201,8 @@ def process_kitti(
 
         result_tuple = segment_pcds(config)
 
-        file_name = (
-            "experiment_{}_sem_voxel_offset0_T0l02/start{}_end{}.pickle".format(
-                id_exec, config.start_index, config.end_index
-            )
+        file_name = "experiment_{}_sem_voxel_offset0_T0l02/start{}_end{}.pickle".format(
+            id_exec, config.start_index, config.end_index
         )
         new_file = open(file_name, "w")
         new_file.close()
@@ -208,44 +215,78 @@ def process_kitti(
 
 
 def main():
+    start_pcd_num = 1500
+    end_pcd_num = 4540
+    T_normalized_cut_common = 0.02
+
     exec_id_1 = 1
     alpha_physical_distance_1 = 5
     beta_instance_distance_1 = 3
-    T_normalized_cut_1 = 0.02
     print("start exec_id={}".format(exec_id_1))
-    process_kitti(1500, 4540, exec_id_1, alpha_physical_distance_1, beta_instance_distance_1, T_normalized_cut_1)
+    process_kitti(
+        start_pcd_num,
+        end_pcd_num,
+        exec_id_1,
+        alpha_physical_distance_1,
+        beta_instance_distance_1,
+        T_normalized_cut_common,
+    )
     print("finish exec_id={}".format(exec_id_1))
 
     exec_id_2 = 2
     alpha_physical_distance_2 = 5
     beta_instance_distance_2 = 5
-    T_normalized_cut_2 = 0.02
     print("start exec_id={}".format(exec_id_2))
-    process_kitti(1500, 4540, exec_id_2, alpha_physical_distance_2, beta_instance_distance_2, T_normalized_cut_2)
+    process_kitti(
+        start_pcd_num,
+        end_pcd_num,
+        exec_id_2,
+        alpha_physical_distance_2,
+        beta_instance_distance_2,
+        T_normalized_cut_common,
+    )
     print("finish exec_id={}".format(exec_id_2))
 
     exec_id_3 = 3
     alpha_physical_distance_3 = 3
     beta_instance_distance_3 = 5
-    T_normalized_cut_3 = 0.02
     print("start exec_id={}".format(exec_id_3))
-    process_kitti(1500, 4540, exec_id_3, alpha_physical_distance_3, beta_instance_distance_3, T_normalized_cut_3)
+    process_kitti(
+        start_pcd_num,
+        end_pcd_num,
+        exec_id_3,
+        alpha_physical_distance_3,
+        beta_instance_distance_3,
+        T_normalized_cut_common,
+    )
     print("finish exec_id={}".format(exec_id_3))
 
     exec_id_4 = 4
     alpha_physical_distance_4 = 3
     beta_instance_distance_4 = 3
-    T_normalized_cut_4 = 0.02
     print("start exec_id={}".format(exec_id_4))
-    process_kitti(1500, 4540, exec_id_4, alpha_physical_distance_4, beta_instance_distance_4, T_normalized_cut_4)
+    process_kitti(
+        start_pcd_num,
+        end_pcd_num,
+        exec_id_4,
+        alpha_physical_distance_4,
+        beta_instance_distance_4,
+        T_normalized_cut_common
+    )
     print("finish exec_id={}".format(exec_id_4))
 
     exec_id_5 = 5
     alpha_physical_distance_5 = 7
     beta_instance_distance_5 = 7
-    T_normalized_cut_5 = 0.02
     print("start exec_id={}".format(exec_id_5))
-    process_kitti(1500, 4540, exec_id_5, alpha_physical_distance_5, beta_instance_distance_5, T_normalized_cut_5)
+    process_kitti(
+        start_pcd_num,
+        end_pcd_num,
+        exec_id_5,
+        alpha_physical_distance_5,
+        beta_instance_distance_5,
+        T_normalized_cut_common,
+    )
     print("finish exec_id={}".format(exec_id_5))
 
 

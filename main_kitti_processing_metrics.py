@@ -76,16 +76,18 @@ def main():
                 start_index = current_from_num
                 end_index = start_index + 4
 
-                file_name = "experiment_{}_sem_voxel_offset0_T0l02/start{}_end{}.pickle".format(
-                    execution_id, start_index, end_index
+                file_name = (
+                    "experiment_{}_sem_voxel_offset0_T0l02/start{}_end{}.pickle".format(
+                        execution_id, start_index, end_index
+                    )
                 )
 
                 with open(file_name, "rb") as file:
                     data = pickle.load(file)
 
-                trace = data[4]['trace_graphcut']
-                clusters = data[5]['clusters_graphcut']
-                inst_label_array_for_clustering = data[6]['inst_label_array_for_clustering']
+                trace = data[4]["trace_graphcut"]
+                clusters = data[5]["clusters_graphcut"]
+                inst_label_array_for_clustering = data[6]["inst_label_array_for_clustering"]
 
                 if (
                     inst_label_array_for_clustering.sum() == 0

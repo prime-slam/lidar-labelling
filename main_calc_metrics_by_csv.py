@@ -19,12 +19,14 @@ def calculate_metrics(exec_id):
     values_pres = []
     values_recall = []
     values_fScore = []
-    with open("experiment_{}_sem_voxel_offset0_T0l02_50.csv".format(exec_id), "r") as file:
+    with open(
+        "experiment_{}_sem_voxel_offset0_T0l02_50.csv".format(exec_id), "r"
+    ) as file:
         reader = csv.DictReader(file)
         for row in reader:
-            values_pres.append(row['precision'])
-            values_recall.append(row['recall'])
-            values_fScore.append(row['fScore'])
+            values_pres.append(row["precision"])
+            values_recall.append(row["recall"])
+            values_fScore.append(row["fScore"])
 
     sum_pres = 0
     pres1 = 0
@@ -57,9 +59,21 @@ def calculate_metrics(exec_id):
             fscore0 += 1
 
     print("start exec_id={}".format(exec_id))
-    print("precision={}, 1={}, 0={}".format(sum_pres/float(len(values_pres)), pres1, pres0))
-    print("recall={}, 1={}, 0={}".format(sum_recall/float(len(values_recall)), recall1, recall0))
-    print("fscore={}, 1={}, 0={}".format(sum_fScore/float(len(values_fScore)), fscore1, fscore0))
+    print(
+        "precision={}, 1={}, 0={}".format(
+            sum_pres/float(len(values_pres)), pres1, pres0
+        )
+    )
+    print(
+        "recall={}, 1={}, 0={}".format(
+            sum_recall/float(len(values_recall)), recall1, recall0
+        )
+    )
+    print(
+        "fscore={}, 1={}, 0={}".format(
+            sum_fScore/float(len(values_fScore)), fscore1, fscore0
+        )
+    )
     print("finish exec_id={}".format(exec_id))
 
 
