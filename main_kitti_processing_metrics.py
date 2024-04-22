@@ -33,7 +33,6 @@ def build_pred_inst_array(
     inst_label_array_for_clustering, clusters, trace, instance_threshold
 ):
     pred_inst_array = np.zeros(len(inst_label_array_for_clustering), dtype=int)
-    k = 0
     free_id = 1
     for cluster in clusters:
         voxel_not_in_gt_cluster_count = 0
@@ -54,17 +53,16 @@ def build_pred_inst_array(
                 for src_point in src_points:
                     pred_inst_array[src_point] = free_id
             free_id += 1
-        k += 1
     return pred_inst_array
 
 
 def main():
 
     from_num = 0
-    to_num = 4540
+    to_num = 1500
 
-    execution_ids = [4]
-    instance_thresholds = [5, 20, 30, 50]
+    execution_ids = [1, 2, 3, 4, 5]
+    instance_thresholds = [50]
 
     for execution_id in execution_ids:
 
@@ -78,16 +76,16 @@ def main():
                 start_index = current_from_num
                 end_index = start_index + 4
 
-                file_name = "experiment_bin_0704_4_sem_offset0_T0l03/start{}_end{}.pickle".format(
-                    start_index, end_index
+                file_name = "experiment_{}_sem_voxel_offset0_T0l02/start{}_end{}.pickle".format(
+                    execution_id, start_index, end_index
                 )
 
                 with open(file_name, "rb") as file:
                     data = pickle.load(file)
 
-                trace = data[2]
-                clusters = data[3]
-                inst_label_array_for_clustering = data[4]
+                trace = data[4]['trace_graphcut']
+                clusters = data[5]['clusters_graphcut']
+                inst_label_array_for_clustering = data[6]['inst_label_array_for_clustering']
 
                 if (
                     inst_label_array_for_clustering.sum() == 0
@@ -122,7 +120,7 @@ def main():
                 pred_labels_unique.discard(0)
 
                 with open(
-                    "experiment_1004_{}_without0_sem_offset0_T0l03_{}.csv".format(
+                    "experiment_{}_sem_voxel_offset0_T0l02_{}.csv".format(
                         execution_id, instance_threshold
                     ),
                     "a",
