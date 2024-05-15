@@ -21,22 +21,30 @@ from sklearn.cluster import HDBSCAN
 
 def segment_pcds_by_hdbscan(start_index, end_index):
 
-    file_name = "experiment_bin_0704_4_sem_voxel_offset0_T0l03/start{}_end{}.pickle".format(
-        start_index, end_index
+    file_name = (
+        "experiment_bin_0704_4_sem_voxel_offset0_T0l03/start{}_end{}.pickle".format(
+            start_index, end_index
+        )
     )
 
-    with open(file_name, 'rb') as file:
+    with open(file_name, "rb") as file:
         data = pickle.load(file)
 
     pcd_hdbscan_voxel_down_points = np.asarray(data[2]["voxel_pcd_original_points"])
     pcd_hdbscan_voxel_down = o3d.geometry.PointCloud()
-    pcd_hdbscan_voxel_down.points = o3d.utility.Vector3dVector(pcd_hdbscan_voxel_down_points)
+    pcd_hdbscan_voxel_down.points = o3d.utility.Vector3dVector(
+        pcd_hdbscan_voxel_down_points
+    )
 
     clusterer = HDBSCAN()
     clusters = clusterer.fit_predict(np.asarray(pcd_hdbscan_voxel_down.points))
 
     return (
-        {"hdbscan_clustered_voxel_pcd_original_points": np.asarray(pcd_hdbscan_voxel_down.points)},
+        {
+            "hdbscan_clustered_voxel_pcd_original_points": np.asarray(
+                pcd_hdbscan_voxel_down.points
+            )
+        },
         {"hdbscan_voxel_trace_original": data[3]["voxel_trace_original"]},
         {"hdbscan_clusters": clusters},
         {"inst_label_array_for_clustering": data[6]["inst_label_array_for_clustering"]},
@@ -54,10 +62,8 @@ def process_kitti_hdbscan(from_num, to_num):
 
         result_tuple = segment_pcds_by_hdbscan(start_index, end_index)
 
-        file_name = (
-            "experiment_bin_0704_4_sem_voxel_offset0_T0l03_hdbscan/start{}_end{}.pickle".format(
-                start_index, end_index
-            )
+        file_name = "experiment_bin_0704_4_sem_voxel_offset0_T0l03_hdbscan/start{}_end{}.pickle".format(
+            start_index, end_index
         )
         new_file = open(file_name, "w")
         new_file.close()

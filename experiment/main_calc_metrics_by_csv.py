@@ -15,6 +15,17 @@
 import csv
 
 
+def calculate_sum_ones_zeros(values):
+    sum, ones, zeros = 0, 0, 0
+    for value in values:
+        sum += float(value)
+        if float(value) == 1.0:
+            ones += 1
+        elif float(value) == 0.0:
+            zeros += 1
+    return sum, ones, zeros
+
+
 def calculate_metrics(file_name):
     values_pres = []
     values_recall = []
@@ -26,35 +37,9 @@ def calculate_metrics(file_name):
             values_recall.append(row["recall"])
             values_fScore.append(row["fScore"])
 
-    sum_pres = 0
-    pres1 = 0
-    pres0 = 0
-    for value in values_pres:
-        sum_pres += float(value)
-        if float(value) == 1.0:
-            pres1 += 1
-        if float(value) == 0.0:
-            pres0 += 1
-
-    sum_recall = 0
-    recall1 = 0
-    recall0 = 0
-    for value in values_recall:
-        sum_recall += float(value)
-        if float(value) == 1.0:
-            recall1 += 1
-        if float(value) == 0.0:
-            recall0 += 1
-
-    sum_fScore = 0
-    fscore1 = 0
-    fscore0 = 0
-    for value in values_fScore:
-        sum_fScore += float(value)
-        if float(value) == 1.0:
-            fscore1 += 1
-        if float(value) == 0.0:
-            fscore0 += 1
+    sum_pres, pres1, pres0 = calculate_sum_ones_zeros(values_pres)
+    sum_recall, recall1, recall0 = calculate_sum_ones_zeros(values_recall)
+    sum_fScore, fscore1, fscore0 = calculate_sum_ones_zeros(values_fScore)
 
     print(
         "precision={}, 1={}, 0={}".format(

@@ -109,14 +109,14 @@ def main():
             ):  # в облаке нет инстансов => пропускаем
                 skipped += 1
                 print(
-                    "start_index={}, end_index={} skip".format(
-                        start_index, end_index
-                    )
+                    "start_index={}, end_index={} skip".format(start_index, end_index)
                 )
                 current_from_num = end_index
                 continue
 
-            clusters_list_without_noise = convert_clusters_to_list_of_point_arrays(clusters_array)[1:]
+            clusters_list_without_noise = convert_clusters_to_list_of_point_arrays(
+                clusters_array
+            )[1:]
 
             pred_inst_array = build_pred_inst_array(
                 copy.deepcopy(inst_label_array_for_clustering),
