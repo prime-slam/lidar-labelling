@@ -58,17 +58,23 @@ def calculate_metrics(file_name):
 
     print(
         "precision={}, 1={}, 0={}".format(
-            sum_pres/float(len(values_pres)), pres1/float(len(values_pres)), pres0/float(len(values_pres))
+            sum_pres/float(len(values_pres)),
+            pres1/float(len(values_pres)),
+            pres0/float(len(values_pres)),
         )
     )
     print(
         "recall={}, 1={}, 0={}".format(
-            sum_recall/float(len(values_recall)), recall1/float(len(values_recall)), recall0/float(len(values_recall))
+            sum_recall/float(len(values_recall)),
+            recall1/float(len(values_recall)),
+            recall0/float(len(values_recall)),
         )
     )
     print(
         "fscore={}, 1={}, 0={}".format(
-            sum_fScore/float(len(values_fScore)), fscore1/float(len(values_fScore)), fscore0/float(len(values_fScore))
+            sum_fScore/float(len(values_fScore)),
+            fscore1/float(len(values_fScore)),
+            fscore0/float(len(values_fScore)),
         )
     )
 
