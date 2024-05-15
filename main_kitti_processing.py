@@ -166,15 +166,10 @@ def segment_pcds(config):
 def process_kitti(
     from_num,
     to_num,
-    id_exec,
     alpha_physical_distance,
     beta_instance_distance,
     T_normalized_cut,
 ):
-
-    reduce_detail_int_to_union_threshold = 0.5
-    reduce_detail_int_to_mask_threshold = 0.6
-
     current_from_num = from_num
 
     while current_from_num < to_num:
@@ -189,8 +184,8 @@ def process_kitti(
                 "alpha_physical_distance": alpha_physical_distance,
                 "beta_instance_distance": beta_instance_distance,
                 "T_normalized_cut": T_normalized_cut,
-                "reduce_detail_int_to_union_threshold": reduce_detail_int_to_union_threshold,
-                "reduce_detail_int_to_mask_threshold": reduce_detail_int_to_mask_threshold,
+                "reduce_detail_int_to_union_threshold": 0.5,
+                "reduce_detail_int_to_mask_threshold": 0.6,
                 "cam_name": "cam2",
                 "R": 18,
                 "nb_neighbors": 25,
@@ -201,8 +196,8 @@ def process_kitti(
 
         result_tuple = segment_pcds(config)
 
-        file_name = "experiment_{}_sem_voxel_offset0_T0l02/start{}_end{}.pickle".format(
-            id_exec, config.start_index, config.end_index
+        file_name = "experiment_2_a5b5_sem_voxel_offset0_T0l025/start{}_end{}.pickle".format(
+            config.start_index, config.end_index
         )
         new_file = open(file_name, "w")
         new_file.close()
@@ -215,79 +210,20 @@ def process_kitti(
 
 
 def main():
-    start_pcd_num = 1500
+    start_pcd_num = 0
     end_pcd_num = 4540
-    T_normalized_cut_common = 0.02
 
-    exec_id_1 = 1
-    alpha_physical_distance_1 = 5
-    beta_instance_distance_1 = 3
-    print("start exec_id={}".format(exec_id_1))
+    alpha_physical_distance = 5
+    beta_instance_distance = 5
+    T_normalized_cut = 0.025
+
     process_kitti(
         start_pcd_num,
         end_pcd_num,
-        exec_id_1,
-        alpha_physical_distance_1,
-        beta_instance_distance_1,
-        T_normalized_cut_common,
+        alpha_physical_distance,
+        beta_instance_distance,
+        T_normalized_cut,
     )
-    print("finish exec_id={}".format(exec_id_1))
-
-    exec_id_2 = 2
-    alpha_physical_distance_2 = 5
-    beta_instance_distance_2 = 5
-    print("start exec_id={}".format(exec_id_2))
-    process_kitti(
-        start_pcd_num,
-        end_pcd_num,
-        exec_id_2,
-        alpha_physical_distance_2,
-        beta_instance_distance_2,
-        T_normalized_cut_common,
-    )
-    print("finish exec_id={}".format(exec_id_2))
-
-    exec_id_3 = 3
-    alpha_physical_distance_3 = 3
-    beta_instance_distance_3 = 5
-    print("start exec_id={}".format(exec_id_3))
-    process_kitti(
-        start_pcd_num,
-        end_pcd_num,
-        exec_id_3,
-        alpha_physical_distance_3,
-        beta_instance_distance_3,
-        T_normalized_cut_common,
-    )
-    print("finish exec_id={}".format(exec_id_3))
-
-    exec_id_4 = 4
-    alpha_physical_distance_4 = 3
-    beta_instance_distance_4 = 3
-    print("start exec_id={}".format(exec_id_4))
-    process_kitti(
-        start_pcd_num,
-        end_pcd_num,
-        exec_id_4,
-        alpha_physical_distance_4,
-        beta_instance_distance_4,
-        T_normalized_cut_common
-    )
-    print("finish exec_id={}".format(exec_id_4))
-
-    exec_id_5 = 5
-    alpha_physical_distance_5 = 7
-    beta_instance_distance_5 = 7
-    print("start exec_id={}".format(exec_id_5))
-    process_kitti(
-        start_pcd_num,
-        end_pcd_num,
-        exec_id_5,
-        alpha_physical_distance_5,
-        beta_instance_distance_5,
-        T_normalized_cut_common,
-    )
-    print("finish exec_id={}".format(exec_id_5))
 
 
 if __name__ == "__main__":

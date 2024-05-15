@@ -15,13 +15,11 @@
 import csv
 
 
-def calculate_metrics(exec_id):
+def calculate_metrics(file_name):
     values_pres = []
     values_recall = []
     values_fScore = []
-    with open(
-        "experiment_{}_sem_voxel_offset0_T0l02_50.csv".format(exec_id), "r"
-    ) as file:
+    with open(file_name, "r") as file:
         reader = csv.DictReader(file)
         for row in reader:
             values_pres.append(row["precision"])
@@ -58,31 +56,25 @@ def calculate_metrics(exec_id):
         if float(value) == 0.0:
             fscore0 += 1
 
-    print("start exec_id={}".format(exec_id))
     print(
         "precision={}, 1={}, 0={}".format(
-            sum_pres/float(len(values_pres)), pres1, pres0
+            sum_pres/float(len(values_pres)), pres1/float(len(values_pres)), pres0/float(len(values_pres))
         )
     )
     print(
         "recall={}, 1={}, 0={}".format(
-            sum_recall/float(len(values_recall)), recall1, recall0
+            sum_recall/float(len(values_recall)), recall1/float(len(values_recall)), recall0/float(len(values_recall))
         )
     )
     print(
         "fscore={}, 1={}, 0={}".format(
-            sum_fScore/float(len(values_fScore)), fscore1, fscore0
+            sum_fScore/float(len(values_fScore)), fscore1/float(len(values_fScore)), fscore0/float(len(values_fScore))
         )
     )
-    print("finish exec_id={}".format(exec_id))
 
 
 def main():
-    calculate_metrics(1)
-    calculate_metrics(2)
-    calculate_metrics(3)
-    calculate_metrics(4)
-    calculate_metrics(5)
+    calculate_metrics("experiment_2_a5b5_sem_voxel_offset0_T0l025_50.csv")
 
 
 if __name__ == "__main__":

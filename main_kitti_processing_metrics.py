@@ -59,94 +59,89 @@ def build_pred_inst_array(
 def main():
 
     from_num = 0
-    to_num = 1500
+    to_num = 4540
 
-    execution_ids = [1, 2, 3, 4, 5]
-    instance_thresholds = [50]
+    instance_thresholds = [5, 20, 30, 50]
 
-    for execution_id in execution_ids:
+    for instance_threshold in instance_thresholds:
+        print("Start to process instance_threshold={}".format(instance_threshold))
 
-        for instance_threshold in instance_thresholds:
-            print("Start to process instance_threshold={}".format(instance_threshold))
+        current_from_num = from_num
 
-            current_from_num = from_num
+        skipped = 0
+        while current_from_num < to_num:
+            start_index = current_from_num
+            end_index = start_index + 4
 
-            skipped = 0
-            while current_from_num < to_num:
-                start_index = current_from_num
-                end_index = start_index + 4
+            file_name = (
+                "experiment_2_a5b5_sem_voxel_offset0_T0l025/start{}_end{}.pickle".format(
+                    start_index, end_index
+                )
+            )
 
-                file_name = (
-                    "experiment_{}_sem_voxel_offset0_T0l02/start{}_end{}.pickle".format(
-                        execution_id, start_index, end_index
+            with open(file_name, "rb") as file:
+                data = pickle.load(file)
+
+            trace = data[4]["trace_graphcut"]
+            clusters = data[5]["clusters_graphcut"]
+            inst_label_array_for_clustering = data[6]["inst_label_array_for_clustering"]
+
+            if (
+                inst_label_array_for_clustering.sum() == 0
+            ):  # в облаке нет инстансов => пропускаем
+                skipped += 1
+                print(
+                    "start_index={}, end_index={} skip".format(
+                        start_index, end_index
                     )
                 )
-
-                with open(file_name, "rb") as file:
-                    data = pickle.load(file)
-
-                trace = data[4]["trace_graphcut"]
-                clusters = data[5]["clusters_graphcut"]
-                inst_label_array_for_clustering = data[6]["inst_label_array_for_clustering"]
-
-                if (
-                    inst_label_array_for_clustering.sum() == 0
-                ):  # в облаке нет инстансов => пропускаем
-                    skipped += 1
-                    print(
-                        "start_index={}, end_index={} skip".format(
-                            start_index, end_index
-                        )
-                    )
-                    current_from_num = end_index
-                    continue
-
-                pred_inst_array = build_pred_inst_array(
-                    copy.deepcopy(inst_label_array_for_clustering),
-                    clusters,
-                    copy.deepcopy(trace),
-                    instance_threshold,
-                )
-
-                pred_labels = pred_inst_array
-                gt_labels = inst_label_array_for_clustering
-                tp_condition = "iou"
-                precision_res = precision(pred_labels, gt_labels, tp_condition)
-                recall_res = recall(pred_labels, gt_labels, tp_condition)
-                fScore_res = fScore(pred_labels, gt_labels, tp_condition)
-
-                gt_labels_unique = set(gt_labels)
-                gt_labels_unique.discard(0)
-
-                pred_labels_unique = set(pred_labels)
-                pred_labels_unique.discard(0)
-
-                with open(
-                    "experiment_{}_sem_voxel_offset0_T0l02_{}.csv".format(
-                        execution_id, instance_threshold
-                    ),
-                    "a",
-                    newline="",
-                ) as file:
-                    writer = csv.writer(file)
-
-                    writer.writerow(
-                        [
-                            str(start_index),
-                            str(end_index),
-                            str(precision_res),
-                            str(recall_res),
-                            str(fScore_res),
-                            len(gt_labels_unique),
-                            len(pred_labels_unique),
-                            len(clusters),
-                        ]
-                    )
-
                 current_from_num = end_index
+                continue
 
-            print(skipped)
-            print("Finish to process instance_threshold={}".format(instance_threshold))
+            pred_inst_array = build_pred_inst_array(
+                copy.deepcopy(inst_label_array_for_clustering),
+                clusters,
+                copy.deepcopy(trace),
+                instance_threshold,
+            )
+
+            pred_labels = pred_inst_array
+            gt_labels = inst_label_array_for_clustering
+            tp_condition = "iou"
+            precision_res = precision(pred_labels, gt_labels, tp_condition)
+            recall_res = recall(pred_labels, gt_labels, tp_condition)
+            fScore_res = fScore(pred_labels, gt_labels, tp_condition)
+
+            gt_labels_unique = set(gt_labels)
+            gt_labels_unique.discard(0)
+
+            pred_labels_unique = set(pred_labels)
+            pred_labels_unique.discard(0)
+
+            with open(
+                "experiment_2_a5b5_sem_voxel_offset0_T0l025_{}.csv".format(instance_threshold),
+                "a",
+                newline="",
+            ) as file:
+                writer = csv.writer(file)
+
+                writer.writerow(
+                    [
+                        str(start_index),
+                        str(end_index),
+                        str(precision_res),
+                        str(recall_res),
+                        str(fScore_res),
+                        len(gt_labels_unique),
+                        len(pred_labels_unique),
+                        len(clusters),
+                    ]
+                )
+
+            current_from_num = end_index
+
+        print(skipped)
+        print("Finish to process instance_threshold={}".format(instance_threshold))
 
 
 if __name__ == "__main__":
