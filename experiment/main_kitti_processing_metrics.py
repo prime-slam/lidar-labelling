@@ -61,7 +61,7 @@ def main():
     from_num = 0
     to_num = 4540
 
-    instance_thresholds = [5, 20, 30, 50]
+    instance_thresholds = [30, 50]
 
     for instance_threshold in instance_thresholds:
         print("Start to process instance_threshold={}".format(instance_threshold))
@@ -73,7 +73,7 @@ def main():
             start_index = current_from_num
             end_index = start_index + 4
 
-            file_name = "experiment_2_a5b5_sem_voxel_offset0_T0l025/start{}_end{}.pickle".format(
+            file_name = "experiment_bin/start{}_end{}.pickle".format(
                 start_index, end_index
             )
 
@@ -86,7 +86,7 @@ def main():
 
             if (
                 inst_label_array_for_clustering.sum() == 0
-            ):  # в облаке нет инстансов => пропускаем
+            ):  # there are no instances in the cloud => skip
                 skipped += 1
                 print(
                     "start_index={}, end_index={} skip".format(start_index, end_index)
@@ -115,9 +115,7 @@ def main():
             pred_labels_unique.discard(0)
 
             with open(
-                "experiment_2_a5b5_sem_voxel_offset0_T0l025_{}.csv".format(
-                    instance_threshold
-                ),
+                "experiment_{}.csv".format(instance_threshold),
                 "a",
                 newline="",
             ) as file:

@@ -197,7 +197,7 @@ def process_kitti(
         result_tuple = segment_pcds(config)
 
         file_name = (
-            "experiment_2_a5b5_sem_voxel_offset0_T0l025/start{}_end{}.pickle".format(
+            "experiment_bin/start{}_end{}.pickle".format(
                 config.start_index, config.end_index
             )
         )
@@ -217,7 +217,7 @@ def main():
 
     alpha_physical_distance = 5
     beta_instance_distance = 5
-    T_normalized_cut = 0.025
+    T_normalized_cut = 0.02
 
     process_kitti(
         start_pcd_num,
