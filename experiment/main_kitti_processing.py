@@ -15,6 +15,9 @@
 import copy
 import numpy as np
 import pickle
+import sys
+
+sys.path.append('/Users/sofiavivdich/proj/lidar-labelling')
 
 from scipy.spatial.distance import cdist
 
