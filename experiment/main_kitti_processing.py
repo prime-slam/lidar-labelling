@@ -196,10 +196,8 @@ def process_kitti(
 
         result_tuple = segment_pcds(config)
 
-        file_name = (
-            "experiment_bin/start{}_end{}.pickle".format(
-                config.start_index, config.end_index
-            )
+        file_name = "experiment_bin/start{}_end{}.pickle".format(
+            config.start_index, config.end_index
         )
         new_file = open(file_name, "w")
         new_file.close()
