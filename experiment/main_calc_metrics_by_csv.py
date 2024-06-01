@@ -65,7 +65,7 @@ def calculate_metrics(file_name):
 
 
 def main():
-    calculate_metrics("experiment_hdbscan_50.csv")
+    calculate_metrics("experiment_50.csv")
 
 
 if __name__ == "__main__":
