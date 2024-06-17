@@ -38,13 +38,13 @@ def generate_random_colors(N):
 
 def get_annotated_image(cam_image):
     sam_result = get_array_instances_by_image_sam(cam_image)
-    mask_annotator = sv.MaskAnnotator()
+    mask_annotator = sv.MaskAnnotator(opacity = 1.0, color_lookup = sv.ColorLookup.INDEX)
     detections = sv.Detections.from_sam(sam_result=sam_result)
 
     black_image = get_black_image(cam_image)
 
     annotated_image = mask_annotator.annotate(
-        scene=np.array(black_image), detections=detections, opacity=1.0
+        scene=np.array(black_image), detections=detections
     )
 
     return im.fromarray(annotated_image)
